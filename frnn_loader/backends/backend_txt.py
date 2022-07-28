@@ -7,14 +7,15 @@ import torch
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
-class backend_txt():
+class backend_txt:
     """Backend to load from txt files.
-    
+
     This backend loads downloaded data from txt files.
 
     Args:
         root (string) : Root path of the data directory
     """
+
     def __init__(self, root):
         self.root = root
 
@@ -25,7 +26,7 @@ class backend_txt():
             machine (machine) : Which machine to load for
             sig (signal) : Type of signal to load
             shotnr (int) : Shot number
-        
+
         Returns:
             timebase (torch.tensor) : Timebase of the signal
             signal (torch.tensor) : Signal samples
@@ -39,11 +40,13 @@ class backend_txt():
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
         try:
-            base_path = join(self.root, 
-                             shot.machine.name,
-                             sig.paths[sig.machines.index(machine)])
+            base_path = join(
+                self.root, shot.machine.name, sig.paths[sig.machines.index(machine)]
+            )
         except ValueError as err:
-            logging.error("Error fetching signal {sig} for machine {machine}, shotnr {shotnr}: {err}")
+            logging.error(
+                "Error fetching signal {sig} for machine {machine}, shotnr {shotnr}: {err}"
+            )
             raise err
 
         file_path = join(base_path, f"{shot.number}.txt")
@@ -67,14 +70,6 @@ class backend_txt():
         data = torch.tensor(float_vals)
 
         return data
-
-
-        
-
-        
-        
-
-
 
 
 # end of file backend_txt.py

@@ -18,7 +18,7 @@ from frnn_loader.utils.hashing import myhash
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
-class signal_new():
+class signal_new:
     """Generalized signal.
 
     This signal class makes use of backends to read data from disk and download from machines.
@@ -29,10 +29,11 @@ class signal_new():
         normalie (bool, optional) : If True, normalize during pre-processing. If False, skip normalization
 
     """
+
     def __init__(self, description, machines, normalize=True):
         self.description = description
         self.machines = machines
-        self.normalize = normalize 
+        self.normalize = normalize
         # I'm skipping several parameters from the original definition here.
 
     def load_data(self, shot, machine, backend):
@@ -42,7 +43,7 @@ class signal_new():
             shotnr (int) : Shot number
             machine (machine) : Machine for which to fetch
             backend (file_backend) : Backend to use for loading
-        
+
         Returns:
             timebase (torch.tensor) : Time base for signal
             signal (torch.tensor) : Sampled signal
@@ -51,11 +52,6 @@ class signal_new():
         tb, sig = backend.load(self, shot, machine)
 
         return tb, sig
-        
-
-
-
-
 
 
 class Signal:

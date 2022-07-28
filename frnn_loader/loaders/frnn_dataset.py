@@ -6,6 +6,7 @@ import logging
 
 from frnn_loader.utils.errors import SignalCorruptedError
 
+
 class shot_dataset(Dataset):
     """Dataset representing a shot.
 
@@ -13,7 +14,7 @@ class shot_dataset(Dataset):
         shotnr (int) :
         machine (:obj:`frnn_loader.backend.machines.machine`)
         signal_list (list) :
-        dtype (torch.dtype, optional) : Floating-point 
+        dtype (torch.dtype, optional) : Floating-point
         backend ()
         download (bool) : If True, use
 
@@ -33,7 +34,6 @@ class shot_dataset(Dataset):
 
         self.signals_dict = {}
         pass
-
 
     def _preprocess(self):
         """Loads all signals and resamples to common time-base.
@@ -167,5 +167,6 @@ class shot_dataset(Dataset):
         if self.target_transform:
             label = self.target_transform(label)
         return image, label
+
 
 # end of file frnn_dataset.py
