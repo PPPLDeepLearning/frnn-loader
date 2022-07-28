@@ -3,7 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 import os
 
-
+"""Comment out for now
 def find_elm_events_tar(time, y, threshold=None, scheme=None, maxi=500):
     res = []
     assert len(time) == len(y)
@@ -67,3 +67,4 @@ def find_elm_events_tar(time, y, threshold=None, scheme=None, maxi=500):
 
     # print(tar.shape)
     return res, tar
+"""

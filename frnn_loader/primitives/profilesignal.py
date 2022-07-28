@@ -74,7 +74,7 @@ class ProfileSignal(Signal):
         if sig.shape[1] < 2:
             err_msg = f"""Signal {self.description}, shot {shot.number}
 should be profile but has only one channel. Possibly only
-one profile fit was run for the duration of the shot and 
+one profile fit was run for the duration of the shot and
 was transposed during downloading. Need at least 2."""
             logging.error(err_msg)
             raise SignalCorruptedError(err_msg)
@@ -102,8 +102,8 @@ was transposed during downloading. Need at least 2."""
                 f = UnivariateSpline(mapping[i, order], sig[i, order], s=0, k=1, ext=3)
                 sig_interp[i, :] = f(remapping)
             else:
-                err_msg = f"""Signal {self.description}, shot {shot.number} 
-has insufficient points for linear interpolation. 
+                err_msg = f"""Signal {self.description}, shot {shot.number}
+has insufficient points for linear interpolation.
 dfitpack.error: (m>k) failed for hidden m: fpcurf0:m=1"""
                 logging.error(err_msg)
                 raise SignalCorruptedError(err_msg)

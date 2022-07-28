@@ -23,32 +23,6 @@ from os.path import join
 # and interpolates to there.
 
 
-class tb_resampler:
-    """Resamples a signal on a time-base"""
-
-    def __init__(self, t_min, t_max, dt):
-        """Initializes signal resampler
-
-        Paramters:
-            t_min (float): Start time of resampled signal
-            t_max (float): Desired end time of resampled signal
-            dt (float): Sampling time of resampled signal
-        """
-        self.t_min = t_min
-        self.t_max = t_max
-        self.dt = dt
-
-    def resample(self, signal, tb):
-        """Resample signal on new time-base
-
-        Parameters:
-            signal (ndarray) : Signal that we want to resample
-            tb (ndarray) : time-bsae of the passed signal
-        """
-        # Assert that signal and time base have the same number of elements
-        assert tb.shape[0] == signal.shape[0]
-
-
 def time_sensitive_interp(x, t, t_new):
     indices = np.maximum(0, np.searchsorted(t, t_new, side="right") - 1)
     return x[indices]

@@ -27,7 +27,7 @@ class ChannelSignal(Signal):
         Args:
             description (string) :
             paths (list[string]) :
-            machines (list :obj:`plasma.primitives.machine.Machine) :
+            machines (list :obj:`frnn_loader.primitives.machine.Machine) :
             tex_label (str) :
             causal_shifts :
             data_avail_tolerances :

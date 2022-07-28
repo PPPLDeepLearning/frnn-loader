@@ -1,8 +1,6 @@
 #!/usr/bin/python
-#-*- coding: UTF-8 -*-
+# -*- coding: UTF-8 -*-
 
-#import os
-#import subprocess
 from setuptools import setup, find_packages
 
 

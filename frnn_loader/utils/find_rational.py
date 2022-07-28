@@ -1,6 +1,8 @@
+# coding: utf-8 -*-
+
 import numpy as np
 
-
+""""Comment out for now
 def find_rational(
     q,
     number,
@@ -57,3 +59,6 @@ def get_rational(
         print("calculating rational.....")
         n, m = find_rational(q, number, max_n=max_n, save_path=save_path, saving=saving)
         return n, m
+"""
+
+# End of file find_rational.py

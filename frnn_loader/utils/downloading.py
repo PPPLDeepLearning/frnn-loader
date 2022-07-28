@@ -8,7 +8,7 @@ import time
 import numpy as np
 
 # import gadata
-# from plasma.primitives.shots import ShotList
+# from frnn_loaders.primitives.shots import ShotList
 
 """MDSplus references:
 http://www.mdsplus.org/index.php?title=Documentation:Tutorial:RemoteAccess&open=76203664636339686324830207&page=Documentation%2FThe+MDSplus+tutorial%2FRemote+data+access+in+MDSplus

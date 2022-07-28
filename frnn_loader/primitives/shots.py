@@ -14,17 +14,16 @@ import logging
 
 from frnn_loader.backends.machine import MachineD3D, MachineJET, MachineNSTX
 
-from frnn_loader.utils.processing import (
-    train_test_split,
-    resample_signal,
-    get_individual_shot_file,
-)
+# from frnn_loader.utils.processing import (
+#     train_test_split,
+#     resample_signal,
+#     get_individual_shot_file,
+# )
 from frnn_loader.utils.downloading import makedirs_process_safe
 from frnn_loader.utils.find_elms import *
 from frnn_loader.utils.find_rational import *
-
 from frnn_loader.data.user_data import bad_shot_list_d3d
-
+from frnn_loader.utils.processing import resample_signal
 from frnn_loader.utils.errors import BadShotException, SignalCorruptedError
 
 
@@ -124,7 +123,7 @@ class Shot(object):
         cont_value
 
         Parameters:
-          use_signals: list(:obj:`plasma.primitives.signals.signal`) List of signals to use for data allocation
+          use_signals: list(:obj:`frnn_loader.primitives.signals.signal`) List of signals to use for data allocation
 
         Output:
           t_array: ndarray(float)  Time base array
@@ -149,113 +148,6 @@ class Shot(object):
             curr_idx += sig.num_channels
 
         return signal_array
-
-    def get_data_arrays_lmtarget(
-        self,
-        use_signals,
-        dtype="float32",
-        predict_mode="shift_target",
-        predict_time=0,
-        target_description="Locked mode amplitude",
-    ):
-        """Mystery function"""
-
-        def derivative_lm(arr):
-            if len(arr) < 3:
-                return arr
-            else:
-                res = [0]
-                for i in range(1, len(arr)):
-                    res.append(arr[i] - arr[i - 1])
-                return np.array(res)
-
-        def derivative_lm_norm(arr):
-            if len(arr) < 3:
-                return arr
-            else:
-                res = [0]
-                for i in range(1, len(arr)):
-                    res.append((arr[i] - arr[i - 1]) / (arr[i - 1] + 0.01))
-                return np.array(res)
-
-        def ttelm(arr):
-            if len(arr) < 3:
-                return [10, 10, 10]
-            else:
-                _, tar = find_elm_events_tar(np.arange(0, len(arr)), arr)
-                cutting_time = 100
-                tar[np.argwhere(tar > cutting_time)] = cutting_time
-                tar = tar * 0.1
-            return tar
-
-        def smooth_lm(arr, window=50):
-            # print('smooth_lm_arr_shape:',arr.shape,arr[0])
-            window = window // 2
-            if len(arr) == 0:
-                return []
-            pad = []
-            for i in range(window):
-                pad.append(arr[0])
-            pad = np.array(pad)
-            arr_pad = np.concatenate((np.array(pad), arr))
-            arr_pad = np.concatenate((arr_pad, np.array([arr[-1]] * window)))
-            ress = []
-            for i in range(window, len(arr) + window):
-                ress.append(sum(arr_pad[i - window : i + window]) / (window * 2))
-            return np.array(ress)
-
-        predict_time = predict_time + 1
-        t_array = self.ttd
-        signal_array = np.zeros(
-            (len(t_array), sum([sig.num_channels for sig in use_signals]) + 2 * 128),
-            dtype=dtype,
-        )
-        curr_idx = 0
-        lm = self.ttd
-        res = []
-        for sig in self.signals:
-            if sig.description in target_description and len(t_array) > predict_time:
-                # print('TargetDescription:',target_description)
-                # print(len(t_array),predict_time)
-                lm = self.ttd.copy()
-                lm[:-predict_time] = np.reshape(
-                    self.signals_dict[sig][predict_time:], (-1)
-                )
-                lm[-predict_time:] = self.signals_dict[sig][-predict_time][0]
-                res.append(lm)
-            #       self.signals_dict[sig]=0.0
-            if sig in use_signals:
-                signal_array[
-                    :, curr_idx : curr_idx + sig.num_channels
-                ] = self.signals_dict[sig]
-                curr_idx += sig.num_channels
-                if sig.description == "q profile efitrt1":
-                    print(self.number)
-                    n_mode, m_mode = get_rational(
-                        self.signals_dict[sig], self.number, saving=True
-                    )
-                    signal_array[:, curr_idx : curr_idx + sig.num_channels] = n_mode
-                    curr_idx += sig.num_channels
-                    signal_array[:, curr_idx : curr_idx + sig.num_channels] = m_mode
-                    curr_idx += sig.num_channels
-
-        #   else:
-        #     signal_array[:, curr_idx:curr_idx
-        #              + sig.num_channels] = self.signals_dict[sig]
-
-        if predict_mode == "smooth_target":
-            for i in range(len(res)):
-                res[i] = smooth_lm(res[i], window=50)
-        if predict_mode == "derivative_target":
-            for i in range(len(res)):
-                res[i] = derivative_lm(res[i])
-        if predict_mode == "derivative_target_norm":
-            for i in range(len(res)):
-                res[i] = derivative_lm_norm(res[i])
-        if predict_mode == "ttelm_target":
-            for i in range(len(res)):
-                res[i] = ttelm(res[i])
-        return np.transpose(np.array(res)), signal_array
 
     def _load_signal_data(self, conf):
         """Load signals and time bases for a given shot.
@@ -298,6 +190,7 @@ class Shot(object):
             except SignalCorruptedError as err:
                 # TODO: Why is there a sig[1] in the dimension
                 # signal = np.zeros((tb.shape[0], sig[1]))
+                logging.error(f"Erorr occorued: {err}")
                 invalid_signals += 1
                 signal_arrays.append(np.zeros([tb.shape[0], 1]), dtype=self.dtype)
                 tb_arrays.append(np.arange(0, 20, 1e-3, dtype=self.dtype))
@@ -329,7 +222,7 @@ class Shot(object):
                 t_max = min(t_max, tb.max())
 
         # make sure the shot is long enough.
-        dt = conf["data"]["dt"]
+        # dt = conf["data"]["dt"]
 
         # Perform sanity checks.
         # 1/ t_max should be larger than t_min
@@ -428,7 +321,7 @@ class Shot(object):
         string = f"""number: {self.number}
                      machine: {self.machine}
                      signals: {self.signals}
-                     signals_dict: {signals_dict}
+                     signals_dict: {self.signals_dict}
                      ttd: {self.ttd}
                      is_disruptive: {self.is_disruptive}
                      t_disrupt: {self.t_disrupt}"""
@@ -558,7 +451,11 @@ class ShotList(object):
                     number=number,
                     t_disrupt=t,
                     machine=shot_list_files_object.machine,
-                    signals=[s for s in signals if s.is_defined_on_machine(machine)],
+                    signals=[
+                        s
+                        for s in signals
+                        if s.is_defined_on_machine(shot_list_files_object.machine)
+                    ],
                 )
             )
 
@@ -711,7 +608,7 @@ class ShotList(object):
             while equal_size and len(subl) < num:
                 subl.append(random.choice(self.shots))
             lists.append(subl)
-        return [ShotList(l) for l in lists]
+        return [ShotList(ll) for ll in lists]
 
     def shuffle(self):
         np.random.shuffle(self.shots)
@@ -721,10 +618,6 @@ class ShotList(object):
 
     def as_list(self):
         return self.shots
-
-    def append(self, shot):
-        assert isinstance(shot, Shot)
-        self.shots.append(shot)
 
     def remove(self, shot):
         assert shot in self.shots
@@ -738,6 +631,116 @@ class ShotList(object):
     def append(self, shot):
         self.append(shot)
         return True
+
+
+"""Comment out for now
+    def get_data_arrays_lmtarget(
+        self,
+        use_signals,
+        dtype="float32",
+        predict_mode="shift_target",
+        predict_time=0,
+        target_description="Locked mode amplitude",
+    ):
+        "Mystery function"
+
+        def derivative_lm(arr):
+            if len(arr) < 3:
+                return arr
+            else:
+                res = [0]
+                for i in range(1, len(arr)):
+                    res.append(arr[i] - arr[i - 1])
+                return np.array(res)
+
+        def derivative_lm_norm(arr):
+            if len(arr) < 3:
+                return arr
+            else:
+                res = [0]
+                for i in range(1, len(arr)):
+                    res.append((arr[i] - arr[i - 1]) / (arr[i - 1] + 0.01))
+                return np.array(res)
+
+        def ttelm(arr):
+            if len(arr) < 3:
+                return [10, 10, 10]
+            else:
+                _, tar = find_elm_events_tar(np.arange(0, len(arr)), arr)
+                cutting_time = 100
+                tar[np.argwhere(tar > cutting_time)] = cutting_time
+                tar = tar * 0.1
+            return tar
+
+        def smooth_lm(arr, window=50):
+            # print('smooth_lm_arr_shape:',arr.shape,arr[0])
+            window = window // 2
+            if len(arr) == 0:
+                return []
+            pad = []
+            for i in range(window):
+                pad.append(arr[0])
+            pad = np.array(pad)
+            arr_pad = np.concatenate((np.array(pad), arr))
+            arr_pad = np.concatenate((arr_pad, np.array([arr[-1]] * window)))
+            ress = []
+            for i in range(window, len(arr) + window):
+                ress.append(sum(arr_pad[i - window : i + window]) / (window * 2))
+            return np.array(ress)
+
+        predict_time = predict_time + 1
+        t_array = self.ttd
+        signal_array = np.zeros(
+            (len(t_array), sum([sig.num_channels for sig in use_signals]) + 2 * 128),
+            dtype=dtype,
+        )
+        curr_idx = 0
+        lm = self.ttd
+        res = []
+        for sig in self.signals:
+            if sig.description in target_description and len(t_array) > predict_time:
+                # print('TargetDescription:',target_description)
+                # print(len(t_array),predict_time)
+                lm = self.ttd.copy()
+                lm[:-predict_time] = np.reshape(
+                    self.signals_dict[sig][predict_time:], (-1)
+                )
+                lm[-predict_time:] = self.signals_dict[sig][-predict_time][0]
+                res.append(lm)
+            #       self.signals_dict[sig]=0.0
+            if sig in use_signals:
+                signal_array[
+                    :, curr_idx : curr_idx + sig.num_channels
+                ] = self.signals_dict[sig]
+                curr_idx += sig.num_channels
+                if sig.description == "q profile efitrt1":
+                    print(self.number)
+                    n_mode, m_mode = get_rational(
+                        self.signals_dict[sig], self.number, saving=True
+                    )
+                    signal_array[:, curr_idx : curr_idx + sig.num_channels] = n_mode
+                    curr_idx += sig.num_channels
+                    signal_array[:, curr_idx : curr_idx + sig.num_channels] = m_mode
+                    curr_idx += sig.num_channels
+
+        #   else:
+        #     signal_array[:, curr_idx:curr_idx
+        #              + sig.num_channels] = self.signals_dict[sig]
+
+        if predict_mode == "smooth_target":
+            for i in range(len(res)):
+                res[i] = smooth_lm(res[i], window=50)
+        if predict_mode == "derivative_target":
+            for i in range(len(res)):
+                res[i] = derivative_lm(res[i])
+        if predict_mode == "derivative_target_norm":
+            for i in range(len(res)):
+                res[i] = derivative_lm_norm(res[i])
+        if predict_mode == "ttelm_target":
+            for i in range(len(res)):
+                res[i] = ttelm(res[i])
+        return np.transpose(np.array(res)), signal_array
+"""
 
 
 # it used to be in utilities, but can't import globals in multiprocessing

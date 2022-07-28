@@ -18,6 +18,46 @@ from frnn_loader.utils.hashing import myhash
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
+class signal_new():
+    """Generalized signal.
+
+    This signal class makes use of backends to read data from disk and download from machines.
+
+    Args:
+        description (string) : A string defining the signal
+        machines (list of machines) : List of machines on which this signal is defined
+        normalie (bool, optional) : If True, normalize during pre-processing. If False, skip normalization
+
+    """
+    def __init__(self, description, machines, normalize=True):
+        self.description = description
+        self.machines = machines
+        self.normalize = normalize 
+        # I'm skipping several parameters from the original definition here.
+
+    def load_data(self, shot, machine, backend):
+        """Load data using the backend.
+
+        Args:
+            shotnr (int) : Shot number
+            machine (machine) : Machine for which to fetch
+            backend (file_backend) : Backend to use for loading
+        
+        Returns:
+            timebase (torch.tensor) : Time base for signal
+            signal (torch.tensor) : Sampled signal
+        """
+
+        tb, sig = backend.load(self, shot, machine)
+
+        return tb, sig
+        
+
+
+
+
+
+
 class Signal:
     """Represents a signal."""
 
@@ -41,10 +81,7 @@ class Signal:
             paths: (string)
             machines: (list(machine)) List of machines on which this signal is defined
             tex_label: (string) Label used in plots
-            causal_shifts: ???
-            is_ip: ???
             normalize: (bool) If true, normalize this data in preprocessing. If False, skip normalization
-            data_avail_tolerances:
             is_strictly_positive: (bool): If true, this data can not have negative values
             mapping_paths: ???
 
@@ -71,11 +108,6 @@ class Signal:
         self.description = description
         self.paths = paths
         self.machines = machines  # on which machines is the signal defined
-        if causal_shifts is None:
-            self.causal_shifts = [0 for m in machines]
-        else:
-            self.causal_shifts = causal_shifts  # causal shift in ms
-        self.is_ip = is_ip
         self.num_channels = 1
         self.normalize = normalize
         if data_avail_tolerances is None:
@@ -104,9 +136,9 @@ class Signal:
             join(prepath, machine.name, dirname), shot_number
         )
 
-    def is_valid(self, prepath, shot, dtype="float32"):
-        t, data, exists = self.load_data(prepath, shot, dtype)
-        return exists
+    # def is_valid(self, prepath, shot, dtype="float32"):
+    #     t, data, exists = self.load_data(prepath, shot, dtype)
+    #     return exists
 
     def _load_data_from_txt_safe(self, prepath, shot, dtype="float32"):
         """Safely load signal data from a stored txt file.

@@ -33,3 +33,6 @@ def get_tree_and_tag_no_backslash(path):
     tree = spl[0]
     tag = spl[1]
     return tree, tag
+
+
+# End of file machine_helper.py

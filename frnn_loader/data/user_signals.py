@@ -710,7 +710,7 @@ signal_group_n1rms_thomson = {
     "ipdirect": ipdirect,
     "iptarget": iptarget,
     "iperr": iperr,
-    #'qpsi_efitrt2':qpsi_efitrt2,
+    # 'qpsi_efitrt2':qpsi_efitrt2,
     "etemp_profile_thomson": etemp_profile_thomson,
     "edens_profile_thomson": edens_profile_thomson,
 }
@@ -792,7 +792,7 @@ signal_group_ped = {
     "tewid": tewid,
     # 'energydt': energydt, 'ipdirect': ipdirect,
     "iptarget": iptarget,
-    #'iperr': iperr,
+    # 'iperr': iperr,
     "etemp_profile": etemp_profile,
     "edens_profile": edens_profile,
 }
