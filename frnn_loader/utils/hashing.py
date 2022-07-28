@@ -61,23 +61,24 @@ def general_object_hash(o):
 
 
 def myhash_obj(x):
-    '''
+    """
     Serialize a generic Python object using dill, decode the bytes obj,
     then pass the Unicode string to the particular hash function.
-    '''
-    return myhash(dill.dumps(x).decode('unicode_escape'))
+    """
+    return myhash(dill.dumps(x).decode("unicode_escape"))
 
 
 def myhash_signals(signals):
-    '''
+    """
     Given a List of Signal class instances, sort by their str representations
     (descriptions), concatenate their hexadecimal hashes (converted to
     base-10), and hash the resulting str
-    '''
-    return myhash(''.join((map(lambda x: x.description, sorted(signals)))))
+    """
+    return myhash("".join((map(lambda x: x.description, sorted(signals)))))
+
 
 def myhash(x):
-    '''
+    """
     Hash a str with MD5 and return as a decimal (integer)
 
     hashlib is used instead of Python built-in method hash()
@@ -90,8 +91,8 @@ def myhash(x):
     See http://ocert.org/advisories/ocert-2011-003.html.
 
     Python 3.4 further improves the default hash algorithm (PEP 456).
-    '''
+    """
     # re-encode the string into bytes object with UTF-8, create hash class obj
     # using MD5 algorithm, then return hex digits as str type, which finally
     # int(..., 16) ---> convert hexadecimal hash to base-10 integer
-    return int(hashlib.md5(x.encode('utf-8')).hexdigest(), 16)
+    return int(hashlib.md5(x.encode("utf-8")).hexdigest(), 16)

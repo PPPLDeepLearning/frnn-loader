@@ -21,11 +21,13 @@ setup(name="frnn_loader",
       # license = "Apache Software License v2",
       test_suite="tests",
       install_requires=[
-          'torch>=1.12',
-          'scipy',
-          'numpy>=1.23',
-          'sphinx',
-          'sphinx-rtd-theme'
+          "torch>=1.12",
+          "scipy",
+          "numpy>=1.23",
+          "sphinx",
+          "sphinx-rtd-theme",
+          "flake8",
+          "black"
           ],
       # TODO(KGF): add optional feature specs for [deephyper,balsam,
       # readthedocs,onnx,keras2onnx]

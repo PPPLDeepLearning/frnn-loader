@@ -11,16 +11,17 @@ import numpy as np
 import logging
 
 from frnn_loader.utils.errors import SignalNotFoundError
+from frnn_loader.backends.machine_helper import (
+    create_missing_value_filler,
+    get_tree_and_tag,
+    get_tree_and_tag_no_backslash,
+)
 
 
-
-from frnn_loader.backends.machine_helper import create_missing_value_filler, get_tree_and_tag, get_tree_and_tag_no_backslash
-
-
-class Machine():
+class Machine:
     """Abstraction of a machine
 
-    This class collects information about 
+    This class collects information about
     * D3D
     * JET
     * NSTX
@@ -40,7 +41,7 @@ class Machine():
                                shot phase for this machine.
 
         """
-        assert(current_threshold > 0.0)
+        assert current_threshold > 0.0
 
         self.current_threshold = current_threshold
 
@@ -65,20 +66,22 @@ class Machine():
 
     def fetch_data(self):
         """Overridden by derived classes."""
-        raise NotImplementedError("Machine.fetch_data should be implemented by derived classes.")
+        raise NotImplementedError(
+            "Machine.fetch_data should be implemented by derived classes."
+        )
 
 
 class MachineNSTX(Machine):
     # Name and Server are class attributes
     name = "NSTX"
     server = "skylark.pppl.gov:8501::"
+
     def __init__(self, current_threshold=2e-1):
         super(MachineNSTX, self).__init__(current_threshold)
         self.name = "NSTX"
 
-
     def fetch_data(signal_path, shot_num, c):
-        """Fetch NSTX data 
+        """Fetch NSTX data
 
         Args:
           signal_path: Path to signals?
@@ -89,12 +92,12 @@ class MachineNSTX(Machine):
           time: Time base for the desired signal
           data: Data of requested signal
         """
-        assert(shot_num > 0)
+        assert shot_num > 0
 
         tree, tag = get_tree_and_tag(signal_path)
         c.openTree(tree, shot_num)
         data = c.get(tag).data()
-        time = c.get('dim_of(' + tag + ')').data()
+        time = c.get("dim_of(" + tag + ")").data()
 
         return time, data
 
@@ -110,12 +113,12 @@ class MachineJET(Machine):
         server (str): "mdsplus.jet.efda.org"
 
     """
+
     def __init__(self, current_threshold=1e5):
         super(MachineJET, self).__init__(current_threshold)
 
-
     def fetch_data(self, signal_path, shot_num, c):
-        """Fetch JET data 
+        """Fetch JET data
 
         Args:
           signal_path: Path to signals?
@@ -147,11 +150,12 @@ class MachineD3D(Machine):
     name = "d3d"
     server = "atlas.gat.com"
     """D3D Machine."""
+
     def __init__(self, current_threshold=2e-1):
         super(MachineD3D, self).__init__(current_threshold)
 
     def fetch_data(MachineD3D, signal_path, shot_num, c):
-        """Fetch D3D data 
+        """Fetch D3D data
 
         Args:
           signal_path: Path to signals?
@@ -167,8 +171,8 @@ class MachineD3D(Machine):
 
         tree, signal = get_tree_and_tag_no_backslash(signal_path)
         if tree is None:
-            signal = c.get('findsig("'+signal+'",_fstree)').value
-            tree = c.get('_fstree').value
+            signal = c.get('findsig("' + signal + '",_fstree)').value
+            tree = c.get("_fstree").value
 
         # Retrieve data
         found = False
@@ -179,27 +183,27 @@ class MachineD3D(Machine):
         # Retrieve data from MDSplus (thin)
         # first try, retrieve directly from tree andsignal
         def get_units(str):
-            units = c.get('units_of('+str+')').data()
+            units = c.get("units_of(" + str + ")").data()
             if units in ["", " "]:
-                units = c.get('units('+str+')').data()
+                units = c.get("units(" + str + ")").data()
             return units
 
         try:
-            c.openTree(tree, shot)
-            data = c.get('_s = '+signal).data()
+            c.openTree(tree, shot_num)
+            data = c.get("_s = " + signal).data()
             # data_units = c.get('units_of(_s)').data()
             rank = np.ndim(data)
             found = True
 
         except Exception as e:
             logging.error(e)
-            raise(e)
+            raise (e)
             pass
 
         # Retrieve data from PTDATA if node not found
         if not found:
             # g.print_unique("not in full path {}".format(signal))
-            data = c.get('_s = ptdata2("'+signal+'",'+str(shot)+')').data()
+            data = c.get('_s = ptdata2("' + signal + '",' + str(shot_num) + ")").data()
             if len(data) != 1:
                 rank = np.ndim(data)
                 found = True
@@ -207,7 +211,7 @@ class MachineD3D(Machine):
         # Retrieve data from Pseudo-pointname if not in ptdata
         if not found:
             # g.print_unique("not in PTDATA {}".format(signal))
-            data = c.get('_s = pseudo("'+signal+'",'+str(shot)+')').data()
+            data = c.get('_s = pseudo("' + signal + '",' + str(shot_num) + ")").data()
             if len(data) != 1:
                 rank = np.ndim(data)
                 found = True
@@ -217,12 +221,12 @@ class MachineD3D(Machine):
 
         # get time base
         if rank > 1:
-            xdata = c.get('dim_of(_s,1)').data()
+            xdata = c.get("dim_of(_s,1)").data()
             # xunits = get_units('dim_of(_s,1)')
-            ydata = c.get('dim_of(_s)').data()
+            ydata = c.get("dim_of(_s)").data()
             # yunits = get_units('dim_of(_s)')
         else:
-            xdata = c.get('dim_of(_s)').data()
+            xdata = c.get("dim_of(_s)").data()
             # xunits = get_units('dim_of(_s)')
 
         # MDSplus seems to return 2-D arrays transposed.  Change them back.
@@ -235,8 +239,6 @@ class MachineD3D(Machine):
 
         xdata = xdata * 1e-3  # time is measued in ms
         return xdata, data, ydata
-
-
 
 
 # End of file machine.py

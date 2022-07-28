@@ -1,10 +1,11 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Helper functions for machine classes.
 
 Various helper functions that modify strings for paths etc.
 """
 
 import numpy as np
+
 
 def create_missing_value_filler():
     """Common filler for missing values.
@@ -20,15 +21,15 @@ def create_missing_value_filler():
 
 def get_tree_and_tag(path):
     """Fetch tree and tag from a path. No idea how this works."""
-    spl = path.split('/')
+    spl = path.split("/")
     tree = spl[0]
-    tag = '\\' + spl[1]
+    tag = "\\" + spl[1]
     return tree, tag
 
 
 def get_tree_and_tag_no_backslash(path):
     """Fetch tree and tag from path, removing backslash"""
-    spl = path.split('/')
+    spl = path.split("/")
     tree = spl[0]
     tag = spl[1]
-    return tree, tag 
+    return tree, tag

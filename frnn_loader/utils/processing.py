@@ -1,4 +1,4 @@
-'''
+"""
 #########################################################
 This file containts classes to handle data processing
 
@@ -6,7 +6,7 @@ Author: Julian Kates-Harbeck, jkatesharbeck@g.harvard.edu
 
 This work was supported by the DOE CSGF program.
 #########################################################
-'''
+"""
 
 from __future__ import print_function
 import itertools
@@ -14,6 +14,7 @@ import itertools
 import numpy as np
 
 from os.path import join
+
 # from scipy.interpolate import UnivariateSpline
 
 # interpolate in a way that doesn't use future information.
@@ -22,8 +23,7 @@ from os.path import join
 # and interpolates to there.
 
 
-
-class tb_resampler():
+class tb_resampler:
     """Resamples a signal on a time-base"""
 
     def __init__(self, t_min, t_max, dt):
@@ -46,13 +46,11 @@ class tb_resampler():
             tb (ndarray) : time-bsae of the passed signal
         """
         # Assert that signal and time base have the same number of elements
-        assert(tb.shape[0] == signal.shape[0])
-
-
+        assert tb.shape[0] == signal.shape[0]
 
 
 def time_sensitive_interp(x, t, t_new):
-    indices = np.maximum(0, np.searchsorted(t, t_new, side='right') - 1)
+    indices = np.maximum(0, np.searchsorted(t, t_new, side="right") - 1)
     return x[indices]
 
 
@@ -90,7 +88,7 @@ def resample_signal(t, sig, tmin, tmax, dt, dtype=np.float32):
         # f = UnivariateSpline(t,sig[:,i],s=0,k=1,ext=0)
         # sig_interp[:,i] = f(tt)
 
-    if(np.any(np.isnan(sig_rs))):
+    if np.any(np.isnan(sig_rs)):
         raise ValueError("Resampled signal contains NaN")
 
     return tt, sig_rs
@@ -110,8 +108,8 @@ def cut_signal(t, sig, tmin, tmax):
         sig (array, float) : signal truncated to [tmin, tmax]
     """
     raise DeprecationWarning("This should not be a separate function...")
-    #mask = np.logical_and(t >= tmin, t <= tmax)
-    #return t[mask], sig[mask, :]
+    # mask = np.logical_and(t >= tmin, t <= tmax)
+    # return t[mask], sig[mask, :]
 
 
 # def cut_and_resample_signal(t, sig, tmin, tmax, dt, dtype=np.float32):
@@ -119,12 +117,12 @@ def cut_signal(t, sig, tmin, tmax):
 #     return resample_signal(t, sig, tmin, tmax, dt, dtype)
 
 
-def get_individual_shot_file(prepath, shot_num, ext='txt'):
+def get_individual_shot_file(prepath, shot_num, ext="txt"):
     return join(prepath, f"{shot_num}.{ext}")
 
 
 def append_to_filename(path, to_append):
-    ending_idx = path.rfind('.')
+    ending_idx = path.rfind(".")
     new_path = path[:ending_idx] + to_append + path[ending_idx:]
     return new_path
 
@@ -132,14 +130,14 @@ def append_to_filename(path, to_append):
 def train_test_split(x, frac, do_shuffle=False):
     if not isinstance(x, np.ndarray):
         return train_test_split_robust(x, frac, do_shuffle)
-    mask = np.array(range(len(x))) < frac*len(x)
+    mask = np.array(range(len(x))) < frac * len(x)
     if do_shuffle:
         np.random.shuffle(mask)
     return x[mask], x[~mask]
 
 
 def train_test_split_robust(x, frac, do_shuffle=False):
-    mask = np.array(range(len(x))) < frac*len(x)
+    mask = np.array(range(len(x))) < frac * len(x)
     if do_shuffle:
         np.random.shuffle(mask)
     train = []
@@ -155,7 +153,7 @@ def train_test_split_robust(x, frac, do_shuffle=False):
 def train_test_split_all(x, frac, do_shuffle=True):
     groups = []
     length = len(x[0])
-    mask = np.array(range(length)) < frac*length
+    mask = np.array(range(length)) < frac * length
     if do_shuffle:
         np.random.shuffle(mask)
     for item in x:
