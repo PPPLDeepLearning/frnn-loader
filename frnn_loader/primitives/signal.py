@@ -45,13 +45,20 @@ class signal_new:
             backend (file_backend) : Backend to use for loading
 
         Returns:
-            timebase (torch.tensor) : Time base for signal
-            signal (torch.tensor) : Sampled signal
+            timebase (torch.tensor) : Time base for signal. Dim0: sample (time)
+            signal (torch.tensor) : Sampled signal Dim0: time, dim1: channel
+
+        Raises:
+            Propagate exceptions from the load method of the backend
         """
+        # Use the backend to fetch the data from file or whatever
+        try:
+            data = backend.load(self, shot, machine)
+        except Exception as err:
+            logging.error(f"{err}")
+            raise err
 
-        tb, sig = backend.load(self, shot, machine)
-
-        return tb, sig
+        return data[:, 0], data[:, 1:]
 
 
 class Signal:

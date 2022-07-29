@@ -21,13 +21,13 @@ class test_backend_txt(unittest.TestCase):
         for descr, sig in d3d_signals.items():
             print(f"Testing backend_txt for signal {sig}")
             try:
-                data = my_backend.load(MachineD3D(), sig, my_shot)
+                data = my_backend.load(MachineD3D(), sig, my_shot.number)
             except NotDownloadedError as err:
                 print(f"{err}")
 
             # Let's see if any data is inf or nan
-            assert(torch.any(data == torch.inf) == False)
-            assert(torch.any(data == torch.nan) == False)
+            assert(torch.any(data == torch.inf).item() is False)
+            assert(torch.any(data == torch.nan).item() is False)
 
 if __name__ == "__main__":
     unittest.main()

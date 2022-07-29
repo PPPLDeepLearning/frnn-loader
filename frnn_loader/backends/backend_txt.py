@@ -14,12 +14,13 @@ class backend_txt:
 
     Args:
         root (string) : Root path of the data directory
+        dtype (torch.dtype, optional) : Datatype of the return tensor
     """
 
-    def __init__(self, root):
+    def __init__(self, root, dtype=torch.float32):
         self.root = root
 
-    def load(self, machine, sig, shot):
+    def load(self, machine, sig, shotnr):
         """Loads a specified signal for a given shot on a machine.
 
         Args:
@@ -41,7 +42,7 @@ class backend_txt:
         # For this we need to pick the correct path from the signal.
         try:
             base_path = join(
-                self.root, shot.machine.name, sig.paths[sig.machines.index(machine)]
+                self.root, machine.name, sig.paths[sig.machines.index(machine)]
             )
         except ValueError as err:
             logging.error(
@@ -49,17 +50,17 @@ class backend_txt:
             )
             raise err
 
-        file_path = join(base_path, f"{shot.number}.txt")
+        file_path = join(base_path, f"{shotnr}.txt")
 
         # Perform checks to see that the file is good.
         if not isfile(file_path):
             raise NotDownloadedError(
-                f"Signal {sig.description}, shot {shot.number} was never downloaded: {file_path} does not exist"
+                f"Signal {sig.description}, shot {shotnr} was never downloaded: {file_path} does not exist"
             )
 
         if getsize(file_path) == 0:
             raise SignalCorruptedError(
-                f"Signal {sig.description}, shot {shot.number} was downloaded incorrectly (empty file). Removing."
+                f"Signal {sig.description}, shot {shotnr} was downloaded incorrectly (empty file). Removing."
             )
 
         # Load manually into a list and convert to torch.tensor
@@ -67,7 +68,7 @@ class backend_txt:
         with open(file_path, "r") as fp:
             for line in fp.readlines():
                 float_vals.append([float(val) for val in line.split()])
-        data = torch.tensor(float_vals)
+        data = torch.tensor(float_vals, dtype=self.dtype)
 
         return data
 
