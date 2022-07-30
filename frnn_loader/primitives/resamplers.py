@@ -9,7 +9,7 @@ we have to bring them to a common time-base.
 import torch
 
 
-class resampler():
+class resampler:
     """Abstract basis class.
 
     Args:
@@ -18,6 +18,7 @@ class resampler():
         dt (float) : Sample spacing
 
     """
+
     def __init__(self, t_min, t_max, dt):
         self.t_min = t_min
         self.t_max = t_max
@@ -72,10 +73,13 @@ class resampler_last(resampler):
     repeated multiple times.
 
     """
+
     def _interp(self, sig_old, tb_old, tb_new):
         # This is a pure conversion from numpy to torch library calls
         # of the original function `time_sensitive_interp`.
-        idx = torch.maximum(torch.tensor([0]), torch.searchsorted(tb_old, tb_new, side="right") - 1)
+        idx = torch.maximum(
+            torch.tensor([0]), torch.searchsorted(tb_old, tb_new, side="right") - 1
+        )
         return sig_old[idx]
 
 

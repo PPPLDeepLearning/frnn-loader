@@ -4,7 +4,11 @@ import torch
 from torch.utils.data import Dataset
 import logging
 
-from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError, BadShotException
+from frnn_loader.utils.errors import (
+    NotDownloadedError,
+    SignalCorruptedError,
+    BadShotException,
+)
 
 
 class shot_dataset(Dataset):
@@ -26,12 +30,17 @@ class shot_dataset(Dataset):
         signals_dict (dict) : Dictionary with signals as keys and pre-processed data array of the signal as values
     """
 
-    def __init__(self, shotnr, machine, signal_list,
-                 resampler,
-                 backend_file,
-                 backend_fetcher=None,
-                 download=False,
-                 dtype=torch.float32):
+    def __init__(
+        self,
+        shotnr,
+        machine,
+        signal_list,
+        resampler,
+        backend_file,
+        backend_fetcher=None,
+        download=False,
+        dtype=torch.float32,
+    ):
         """Initializes the shot dataset."""
         self.shotnr = shotnr
         self.machine = machine
@@ -45,7 +54,7 @@ class shot_dataset(Dataset):
         # If want to download, see that we have a fetcher passed
         # TODO: Make this nicer.
         if self.download:
-            assert(self.backend_fetcher is not None)
+            assert self.backend_fetcher is not None
 
         # signal_dict is a dict with
         # Keys: signals defined in signal_list
@@ -53,7 +62,8 @@ class shot_dataset(Dataset):
         # It is populated by self._preprocess()
         self.signal_tensor = torch.zeros(
             (len(self.resampler), sum([sig.num_channels for sig in self.signal_list])),
-            dtype=self.dtype)
+            dtype=self.dtype,
+        )
         self._preprocess()
         pass
 
@@ -94,7 +104,9 @@ class shot_dataset(Dataset):
             # Interpolate on new time-base
             tb_rs, sig_rs = self.resampler(tb, sig)
             # Populate signals_dict with the re-sampled
-            self.signal_tensor[:, curr_channel : curr_channel + sig.num_channels] = sig_rs[:]
+            self.signal_tensor[
+                :, curr_channel : curr_channel + sig.num_channels
+            ] = sig_rs[:]
         # Store the time-base
         self.tb = tb_rs
 
