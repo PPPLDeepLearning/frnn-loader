@@ -85,27 +85,34 @@ class shot_dataset(Dataset):
         """
         logging.info("Preprocessing shot {self.shotnr}")
         time_arrays, signal_arrays, t_min, t_max = self._load_signal_data()
-        logging.info(f"Resmapling shot {self.shotnr}")
+        print("len(time_arrays): ", len(time_arrays))
+        print("len(signal_arrays): ", len(signal_arrays))
+        for i, sig in enumerate(signal_arrays):
+            print(f"      {i}: shape = ", sig.shape)
+        print(f"t_min = {t_min}, t_max = {t_max}")
+        #res = self._load_signal_data()
         # resample signals on a common time-base
-        assert (len(signal_arrays) == len(time_arrays) == len(self.signals)) and len(
-            signal_arrays
-        ) > 0
+        assert(len(signal_arrays) > 0)
+        assert(len(signal_arrays) == len(time_arrays))
+        assert(len(signal_arrays) == len(self.signal_list)) 
 
         # Re-sample each signal individually
         # Store the re-sampled signal in a tensor
-
+        logging.info(f"Resmapling shot {self.shotnr}")
         # Keep track of how many channels a signal has used
         curr_channel = 0
-        for (i, signal) in enumerate(self.signals):
+        for (i, signal) in enumerate(self.signal_list):
+            print(i, signal, time_arrays[i].shape, signal_arrays[i].shape)
             # Cut the signal to [t_min:t_max]
             good_idx = (time_arrays[i] >= t_min) & (time_arrays[i] <= t_max)
             tb = time_arrays[i][good_idx]
-            sig = signal_arrays[i][good_idx]
+            sig = signal_arrays[i][good_idx, :]
+            print(good_idx.shape, tb.shape, sig.shape)
             # Interpolate on new time-base
             tb_rs, sig_rs = self.resampler(tb, sig)
-            # Populate signals_dict with the re-sampled
+            # Populate signals_tensor with the re-sampled signals
             self.signal_tensor[
-                :, curr_channel : curr_channel + sig.num_channels
+                :, curr_channel : curr_channel + signal.num_channels
             ] = sig_rs[:]
         # Store the time-base
         self.tb = tb_rs
@@ -131,19 +138,18 @@ class shot_dataset(Dataset):
         # t_thresh = -1
         signal_arrays = []  # To be populated with a list of ndarrays with shot data
         tb_arrays = []  # To be populated with a list of ndarrays, containing time bases
-
         invalid_signals = 0  # Counts the number of invalid signals for this shot
 
         # Iterate over all signals and extract data
         for signal in self.signal_list:
             # Try loading the signal. When this fails, append dummy data.
             try:
-                tb, signal = self.backend_file.load(self.machine, signal, self)
+                tb, signal_data = self.backend_file.load(self.machine, signal, self.shotnr)
 
             except SignalCorruptedError as err:
                 # TODO: Why is there a sig[1] in the dimension
                 # signal = np.zeros((tb.shape[0], sig[1]))
-                logging.error(f"Erorr occorued: {err}")
+                logging.error(f"Erorr occured: {err}")
                 invalid_signals += 1
                 signal_arrays.append(torch.zeros([tb.shape[0], 1]), dtype=self.dtype)
                 tb_arrays.append(torch.arange(0, 20, 1e-3, dtype=self.dtype))
@@ -156,10 +162,13 @@ class shot_dataset(Dataset):
                 else:
                     raise err
 
+            log_msg = f"Loaded signal {signal}: tb.shape = " + str(tb.shape) + ", signal.shape = " +str(signal_data.shape)
+            print(log_msg)
+
             # At this point, assume that the loaded data is good.
             # Update t_min and append signal and timebase to the working data
             t_min = max(t_min, tb.min())
-            signal_arrays.append(signal)
+            signal_arrays.append(signal_data)
             tb_arrays.append(tb)
 
             # TODO: Put this code block into a transform
@@ -193,17 +202,16 @@ class shot_dataset(Dataset):
         #        if (t_max - t_min)/dt <= (2 * conf['model']['length'] + conf['data']['T_min_warn']):
         #            raise BadShotException(f"Shot {self.number} contains insufficient data, omitting.")
         # 3/ The shot is marked disruptive and the disruption occurs after all measurements
-        if self.is_disruptive and self.t_disrupt > t_max:
-            raise BadShotException(
-                f"Shot {self.number} is disruptive at {self.t_disrupt}s but data stops at {t_max}"
-            )
+        # if self.is_disruptive and self.t_disrupt > t_max:
+        #     raise BadShotException(
+        #         f"Shot {self.number} is disruptive at {self.t_disrupt}s but data stops at {t_max}"
+        #     )
 
         if invalid_signals > 2:
             raise BadShotException(f"Shot {self.number} has more than 2 bad channels.")
 
         # if self.is_disruptive:
         #     t_max = self.t_disrupt
-
         return tb_arrays, signal_arrays, t_min, t_max
 
     def __len__(self):

@@ -19,6 +19,7 @@ class backend_txt:
 
     def __init__(self, root, dtype=torch.float32):
         self.root = root
+        self.dtype = dtype
 
     def load(self, machine, sig, shotnr):
         """Loads a specified signal for a given shot on a machine.
@@ -69,8 +70,10 @@ class backend_txt:
             for line in fp.readlines():
                 float_vals.append([float(val) for val in line.split()])
         data = torch.tensor(float_vals, dtype=self.dtype)
-
-        return data
+        #print(f"... In load. data.shape = ", data.shape)
+        # First column is the timebase
+        # After second column is the signal data
+        return data[:, 0], data[:, 1:]
 
 
 # end of file backend_txt.py
