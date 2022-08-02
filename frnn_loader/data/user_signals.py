@@ -11,6 +11,7 @@ import numpy as np
 import sys
 
 from frnn_loader.primitives.signal import Signal
+from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.primitives.profilesignal import ProfileSignal
 from frnn_loader.primitives.channelsignal import ChannelSignal
 
@@ -258,7 +259,7 @@ etemp = Signal(
     data_avail_tolerances=[0.05],
 )
 
-q95 = Signal(
+q95 = signal_0d(
     "q95 safety factor",
     ["ppf/efit/q95", "EFITRT1/RESULTS.AEQDSK.Q95"],
     [MachineJET, MachineD3D],
@@ -509,7 +510,7 @@ energydt = Signal("stored energy time derivative", ["jpf/gs/bl-fdwdt<s"], [Machi
 
 torquein = Signal("Input Beam Torque", ["/bmstinj"], [MachineD3D])
 
-fs07 = Signal("filterscope fs07", ["fs07"], [MachineD3D])
+fs07 = signal_0d("filterscope fs07", ["fs07"], [MachineD3D])
 
 neped = Signal("neped", ["prmtan_neped"], [MachineD3D])
 

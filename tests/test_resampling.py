@@ -19,7 +19,7 @@ class test_resampler_last(unittest.TestCase):
         sig_old = sig_old.unsqueeze(1)
 
         # Resampler on new time interval
-        my_resampler = resampler_last(0.0, 1.0, 1e-2)
+        my_resampler = resampler_last(0.0, 1.0, 2e-2)
         tb_new, sig_new = my_resampler(tb_old, sig_old)
 
         # Get the over-lapping part of the time bases
@@ -31,8 +31,8 @@ class test_resampler_last(unittest.TestCase):
 
         # Test that there are no strange values in the resampled time series
         # We may have to relaxe the difference a bit.
-        plt.plot(tb_old, sig_old)
-        plt.plot(tb_new, sig_new)
+        plt.plot(tb_new, sig_new, 'o-')
+        plt.plot(tb_old, sig_old, 'o-')
         plt.show()
         #assert(torch.abs(sig_new[idx_new].max() - sig_old[idx_old].max()) < 1e-2)
         #assert(torch.abs(sig_new[idx_new].min() - sig_old[idx_old].min()) < 1e-2)

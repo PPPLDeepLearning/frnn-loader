@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 import unittest
 
-from frnn_loader.backends.machine import  MachineD3D
+from frnn_loader.backends.machine import MachineD3D
 from frnn_loader.primitives.signal import Signal
 
 

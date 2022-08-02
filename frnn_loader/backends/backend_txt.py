@@ -8,7 +8,7 @@ from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
 class backend_txt:
-    """Backend to load from txt files.
+    """Backend to xtore/load from txt files.
 
     This backend loads downloaded data from txt files.
 
@@ -70,7 +70,7 @@ class backend_txt:
             for line in fp.readlines():
                 float_vals.append([float(val) for val in line.split()])
         data = torch.tensor(float_vals, dtype=self.dtype)
-        #print(f"... In load. data.shape = ", data.shape)
+        # print(f"... In load. data.shape = ", data.shape)
         # First column is the timebase
         # After second column is the signal data
         return data[:, 0], data[:, 1:]

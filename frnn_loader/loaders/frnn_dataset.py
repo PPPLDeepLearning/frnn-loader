@@ -85,16 +85,11 @@ class shot_dataset(Dataset):
         """
         logging.info("Preprocessing shot {self.shotnr}")
         time_arrays, signal_arrays, t_min, t_max = self._load_signal_data()
-        print("len(time_arrays): ", len(time_arrays))
-        print("len(signal_arrays): ", len(signal_arrays))
-        for i, sig in enumerate(signal_arrays):
-            print(f"      {i}: shape = ", sig.shape)
-        print(f"t_min = {t_min}, t_max = {t_max}")
-        #res = self._load_signal_data()
+        # res = self._load_signal_data()
         # resample signals on a common time-base
-        assert(len(signal_arrays) > 0)
-        assert(len(signal_arrays) == len(time_arrays))
-        assert(len(signal_arrays) == len(self.signal_list)) 
+        assert len(signal_arrays) > 0
+        assert len(signal_arrays) == len(time_arrays)
+        assert len(signal_arrays) == len(self.signal_list)
 
         # Re-sample each signal individually
         # Store the re-sampled signal in a tensor
@@ -102,18 +97,17 @@ class shot_dataset(Dataset):
         # Keep track of how many channels a signal has used
         curr_channel = 0
         for (i, signal) in enumerate(self.signal_list):
-            print(i, signal, time_arrays[i].shape, signal_arrays[i].shape)
             # Cut the signal to [t_min:t_max]
             good_idx = (time_arrays[i] >= t_min) & (time_arrays[i] <= t_max)
             tb = time_arrays[i][good_idx]
             sig = signal_arrays[i][good_idx, :]
-            print(good_idx.shape, tb.shape, sig.shape)
             # Interpolate on new time-base
             tb_rs, sig_rs = self.resampler(tb, sig)
             # Populate signals_tensor with the re-sampled signals
             self.signal_tensor[
                 :, curr_channel : curr_channel + signal.num_channels
             ] = sig_rs[:]
+            curr_channel += signal.num_channels
         # Store the time-base
         self.tb = tb_rs
 
@@ -144,7 +138,9 @@ class shot_dataset(Dataset):
         for signal in self.signal_list:
             # Try loading the signal. When this fails, append dummy data.
             try:
-                tb, signal_data = self.backend_file.load(self.machine, signal, self.shotnr)
+                tb, signal_data = self.backend_file.load(
+                    self.machine, signal, self.shotnr
+                )
 
             except SignalCorruptedError as err:
                 # TODO: Why is there a sig[1] in the dimension
@@ -162,12 +158,17 @@ class shot_dataset(Dataset):
                 else:
                     raise err
 
-            log_msg = f"Loaded signal {signal}: tb.shape = " + str(tb.shape) + ", signal.shape = " +str(signal_data.shape)
-            print(log_msg)
+            log_msg = (
+                f"Loaded signal {signal}: tb.shape = "
+                + str(tb.shape)
+                + ", signal.shape = "
+                + str(signal_data.shape)
+            )
 
             # At this point, assume that the loaded data is good.
             # Update t_min and append signal and timebase to the working data
             t_min = max(t_min, tb.min())
+            t_max = min(t_max, tb.max())
             signal_arrays.append(signal_data)
             tb_arrays.append(tb)
 
