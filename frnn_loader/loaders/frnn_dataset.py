@@ -164,6 +164,7 @@ class shot_dataset(Dataset):
                 + ", signal.shape = "
                 + str(signal_data.shape)
             )
+            print(log_msg)
 
             # At this point, assume that the loaded data is good.
             # Update t_min and append signal and timebase to the working data

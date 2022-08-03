@@ -512,15 +512,15 @@ torquein = Signal("Input Beam Torque", ["/bmstinj"], [MachineD3D])
 
 fs07 = signal_0d("filterscope fs07", ["fs07"], [MachineD3D])
 
-neped = Signal("neped", ["prmtan_neped"], [MachineD3D])
+neped = signal_0d("neped", ["prmtan_neped"], [MachineD3D])
 
-newid = Signal("newid", ["prmtan_newid"], [MachineD3D])
+newid = signal_0d("newid", ["prmtan_newid"], [MachineD3D])
 
-peped = Signal("peped", ["prmtan_peped"], [MachineD3D])
+peped = signal_0d("peped", ["prmtan_peped"], [MachineD3D])
 
-teped = Signal("teped", ["prmtan_teped"], [MachineD3D])
+teped = signal_0d("teped", ["prmtan_teped"], [MachineD3D])
 
-tewid = Signal("tewid", ["prmtan_tewid"], [MachineD3D])
+tewid = signal_0d("tewid", ["prmtan_tewid"], [MachineD3D])
 
 torqueint = Signal(
     "Input Beam Torque tol", ["bmstinj"], [MachineD3D], data_avail_tolerances=[0.029]

@@ -18,18 +18,23 @@ from frnn_loader.utils.hashing import myhash
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
-class signal_base():
+class signal_base:
     """Abstract base class for all signal."""
-    def __init__(self, description, paths,
-                 machines,
-                 causal_shifts=None,
-                 data_avail_tolerances=None,
-                 normalize=True):
+
+    def __init__(
+        self,
+        description,
+        paths,
+        machines,
+        causal_shifts=None,
+        data_avail_tolerances=None,
+        normalize=True,
+    ):
         self.description = description
         self.paths = paths
         self.machines = machines
-        self.causal_shifts = causal_shifts,
-        self.data_avail_tolerances = data_avail_tolerances,
+        self.causal_shifts = (causal_shifts,)
+        self.data_avail_tolerances = (data_avail_tolerances,)
         self.normalize = normalize
 
     def load_data(self, shot, machine, backend):
@@ -49,12 +54,12 @@ class signal_base():
         """
         # Use the backend to fetch the data from file or whatever
         try:
-            data = backend.load(self, shot, machine)
+            tb, data = backend.load(machine, self, shot)
         except Exception as err:
             logging.error(f"{err}")
             raise err
 
-        return data[:, 0], data[:, 1:]
+        return tb, data
 
     def description_plus_paths(self):
         return self.description + " " + " ".join(self.paths)
@@ -91,20 +96,26 @@ class signal_0d(signal_base):
         normalize (bool, optional) : If True, normalize during pre-processing. If False, skip normalization
 
     """
-    def __init__(self, description, paths,
-                 machines,
-                 causal_shifts=None,
-                 data_avail_tolerances=None,
-                 normalize=True):
-        super().__init__(description, paths,
-                         machines,
-                         causal_shifts,
-                         data_avail_tolerances,
-                         normalize)
+
+    def __init__(
+        self,
+        description,
+        paths,
+        machines,
+        causal_shifts=None,
+        data_avail_tolerances=None,
+        normalize=True,
+    ):
+        super().__init__(
+            description,
+            paths,
+            machines,
+            causal_shifts,
+            data_avail_tolerances,
+            normalize,
+        )
         self.num_channels = 1
         # I'm skipping several parameters from the original definition here.
-
-
 
 
 class Signal:
@@ -164,7 +175,6 @@ class Signal:
         self.data_avail_tolerances = data_avail_tolerances
         self.is_strictly_positive = is_strictly_positive
         self.mapping_paths = mapping_paths
-
 
     def get_file_path(self, prepath, machine, shot_number):
         """Loads signal for given machine and shot number.

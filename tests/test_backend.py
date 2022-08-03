@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # run with
 # python -m unittest tests/test_backends.py
 import unittest
