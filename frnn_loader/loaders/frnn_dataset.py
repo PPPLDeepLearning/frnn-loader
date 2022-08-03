@@ -60,12 +60,10 @@ class shot_dataset(Dataset):
         # Keys: signals defined in signal_list
         # Values: Signal samples interpolated on a common time-base.
         # It is populated by self._preprocess()
-        self.signal_tensor = torch.zeros(
-            (len(self.resampler), sum([sig.num_channels for sig in self.signal_list])),
-            dtype=self.dtype,
-        )
+        self.total_channels = sum([sig.num_channels for sig in self.signal_list])
+        self.signal_tensor = torch.zeros((len(self.resampler), self.total_channels), dtype=self.dtype)
+        
         self._preprocess()
-        pass
 
     def _preprocess(self):
         """Loads all signals and resamples to common time-base.
@@ -109,6 +107,7 @@ class shot_dataset(Dataset):
             ] = sig_rs[:]
             curr_channel += signal.num_channels
         # Store the time-base
+
         self.tb = tb_rs
 
         return None
@@ -221,16 +220,9 @@ class shot_dataset(Dataset):
         return len(self.tb)
 
     def __getitem__(self, idx):
-        """Fetches a single item."""
-        pass
-        # img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
-        # image = read_image(img_path)
-        # label = self.img_labels.iloc[idx, 1]
-        # if self.transform:
-        #     image = self.transform(image)
-        # if self.target_transform:
-        #     label = self.target_transform(label)
-        # return image, label
+        """Fetches a single sample."""
+        return self.signal_tensor[idx, :]
+        # return torch.hstack([self.tb_rs.unsqueeze(1), self.signal_tensor[:, idx]]) 
 
 
 # end of file frnn_dataset.py

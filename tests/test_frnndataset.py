@@ -15,6 +15,7 @@ from frnn_loader.loaders.frnn_dataset import shot_dataset
 
 class test_frnn_dataset(unittest.TestCase):
     """Test routines working with the frnn dataset."""
+
     def test_frnn_dataset(self):
         """Test instantiation of the dataset."""
         # Instantiate a resampler
@@ -24,7 +25,10 @@ class test_frnn_dataset(unittest.TestCase):
         my_backend_file = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021/")
 
         ds = shot_dataset(184800, MachineD3D(), [fs07, q95, neped], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
-        print(ds)
+        print(ds.signal_tensor.shape)
+        for item in ds:
+            print(item.shape)
+
 
 
 if __name__ == "__main__":
