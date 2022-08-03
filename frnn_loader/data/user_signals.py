@@ -251,7 +251,7 @@ rho_profile_spatial = ProfileSignal(
     data_avail_tolerances=[0.05],
 )
 
-etemp = Signal(
+etemp = signal_0d(
     "electron temperature",
     ["ppf/hrtx/te0"],
     [MachineJET],
@@ -268,7 +268,7 @@ q95 = signal_0d(
     data_avail_tolerances=[0.03, 0.02],
 )
 
-qmin = Signal(
+qmin = signal_0d(
     "Minimum safety factor",
     ["EFITRT1/RESULTS.AEQDSK.QMIN"],
     [MachineD3D],
@@ -277,7 +277,7 @@ qmin = Signal(
     data_avail_tolerances=[0.02],
 )
 
-q95_EFITRT1 = Signal(
+q95_EFITRT1 = signal_0d(
     "q95 safety factor in real time",
     ["ppf/efit/q95", "EFITRT1/RESULTS.AEQDSK.Q95"],
     [MachineJET, MachineD3D],
@@ -286,7 +286,7 @@ q95_EFITRT1 = Signal(
     data_avail_tolerances=[0.03, 0.029],
 )
 
-q95_efitrt2 = Signal(
+q95_efitrt2 = signal_0d(
     "q95 safety factor in real time efitrt2",
     ["ppf/efit/q95", "EFITRT2/RESULTS.AEQDSK.Q95"],
     [MachineJET, MachineD3D],
@@ -295,7 +295,7 @@ q95_efitrt2 = Signal(
     data_avail_tolerances=[0.03, 0.029],
 )
 
-vd = Signal(
+vd = signal_0d(
     "vertical displacement change",
     ["/vpsdfz"],
     [MachineD3D],
@@ -304,7 +304,7 @@ vd = Signal(
     data_avail_tolerances=[0.029],
 )
 
-q95t = Signal(
+q95t = signal_0d(
     "q95 safety factor tol",
     ["ppf/efit/q95", "EFIT01/RESULTS.AEQDSK.Q95"],
     [MachineJET, MachineD3D],
@@ -315,28 +315,28 @@ q95t = Signal(
 
 # "d3d/ipsip" was used before, ipspr15V seems to be available for a
 # superset of shots.
-ipsip = Signal(
+ipsip = signal_0d(
     "plasma current ipsip",
     ["jpf/da/c2-ipla", "ipsip"],
     [MachineJET, MachineD3D],
     is_ip=True,
 )
 
-ip = Signal(
+ip = signal_0d(
     "plasma current",
     ["jpf/da/c2-ipla", "ipspr15V"],
     [MachineJET, MachineD3D],
     is_ip=True,
 )
 
-ipori = Signal(
+ipori = signal_0d(
     "plasma current",
     ["jpf/da/c2-ipla", "ipspr15V"],
     [MachineJET, MachineD3D],
     is_ip=True,
 )
 
-ipt = Signal(
+ipt = signal_0d(
     "plasma current tol",
     ["jpf/da/c2-ipla", "ipsip"],
     [MachineJET, MachineD3D],
@@ -344,47 +344,47 @@ ipt = Signal(
     data_avail_tolerances=[0.029, 0.029],
 )
 
-iptarget = Signal("plasma current target", ["ipsiptargt"], [MachineD3D])
+iptarget = signal_0d("plasma current target", ["ipsiptargt"], [MachineD3D])
 
-iptargett = Signal(
+iptargett = signal_0d(
     "plasma current target tol",
     ["ipsiptargt"],
     [MachineD3D],
     data_avail_tolerances=[0.029],
 )
 
-iperr = Signal("plasma current error", ["ipeecoil"], [MachineD3D])
+iperr = signal_0d("plasma current error", ["ipeecoil"], [MachineD3D])
 
-iperrt = Signal(
+iperrt = signal_0d(
     "plasma current error tol",
     ["ipeecoil"],
     [MachineD3D],
     data_avail_tolerances=[0.029],
 )
 
-li = Signal(
+li = signal_0d(
     "internal inductance", ["jpf/gs/bl-li<s", "efsli"], [MachineJET, MachineD3D]
 )
 
-lit = Signal(
+lit = signal_0d(
     "internal inductance tol",
     ["jpf/gs/bl-li<s", "efsli"],
     [MachineJET, MachineD3D],
     data_avail_tolerances=[0.029, 0.029],
 )
 
-lm = Signal(
+lm = signal_0d(
     "Locked mode amplitude", ["jpf/da/c2-loca", "dusbradial"], [MachineJET, MachineD3D]
 )
 
-lmt = Signal(
+lmt = signal_0d(
     "Locked mode amplitude tol",
     ["jpf/da/c2-loca", "dusbradial"],
     [MachineJET, MachineD3D],
     data_avail_tolerances=[0.029, 0.029],
 )
 
-n1_rms = Signal(
+n1_rms = signal_0d(
     "n1 finite frequency signals",
     ["mhd/mirnov.n1rms"],
     [MachineD3D],
@@ -392,7 +392,7 @@ n1_rms = Signal(
     causal_shifts=10,
 )
 
-n2_rms_10 = Signal(
+n2_rms_10 = signal_0d(
     "n2 finite frequency signals_10ms",
     ["mhd/mirnov.n2rms"],
     [MachineD3D],
@@ -400,7 +400,7 @@ n2_rms_10 = Signal(
     causal_shifts=10,
 )
 
-n3_rms_10 = Signal(
+n3_rms_10 = signal_0d(
     "n3 finite frequency signals_10ms",
     ["mhd/mirnov.n3rms"],
     [MachineD3D],
@@ -408,21 +408,21 @@ n3_rms_10 = Signal(
     causal_shifts=10,
 )
 
-n1_rms_no_shift = Signal(
+n1_rms_no_shift = signal_0d(
     "n1 finite frequency signals no shift",
     ["mhd/mirnov.n1rms"],
     [MachineD3D],
     data_avail_tolerances=[0.029],
 )
 
-dens = Signal(
+dens = signal_0d(
     "Plasma density",
     ["jpf/df/g1r-lid:003", "dssdenest"],
     [MachineJET, MachineD3D],
     is_strictly_positive=True,
 )
 
-denst = Signal(
+denst = signal_0d(
     "Plasma density tol",
     ["jpf/df/g1r-lid:003", "dssdenest"],
     [MachineJET, MachineD3D],
@@ -430,33 +430,33 @@ denst = Signal(
     data_avail_tolerances=[0.029, 0.029],
 )
 
-energy = Signal(
+energy = signal_0d(
     "stored energy", ["jpf/gs/bl-wmhd<s", "efswmhd"], [MachineJET, MachineD3D]
 )
 
-energyt = Signal(
+energyt = signal_0d(
     "stored energy tol",
     ["jpf/gs/bl-wmhd<s", "efswmhd"],
     [MachineJET, MachineD3D],
     data_avail_tolerances=[0.029, 0.029],
 )
 
-pin = Signal(
+pin = signal_0d(
     "Input Power (beam for MachineD3D)",
     ["jpf/gs/bl-ptot<s", "bmspinj"],
     [MachineJET, MachineD3D],
 )
 
-pint = Signal(
+pint = signal_0d(
     "Input Power (beam for MachineD3D) tol",
     ["jpf/gs/bl-ptot<s", "bmspinj"],
     [MachineJET, MachineD3D],
     data_avail_tolerances=[0.029, 0.029],
 )
 
-pradtot = Signal("Radiated Power", ["jpf/db/b5r-ptot>out"], [MachineJET])
+pradtot = signal_0d("Radiated Power", ["jpf/db/b5r-ptot>out"], [MachineJET])
 
-pradtott = Signal(
+pradtott = signal_0d(
     "Radiated Power tol",
     ["jpf/db/b5r-ptot>out"],
     [MachineJET],
@@ -489,26 +489,26 @@ pradedget = ChannelSignal(
     data_avail_tolerances=[0.029, 0.029],
 )
 
-pechin = Signal(
+pechin = signal_0d(
     "ECH input power, not always on", ["RF/ECH.TOTAL.ECHPWRC"], [MachineD3D]
 )
 
-pechint = Signal(
+pechint = signal_0d(
     "ECH input power, not always on tol",
     ["RF/ECH.TOTAL.ECHPWRC"],
     [MachineD3D],
     data_avail_tolerances=[0.029],
 )
 
-betan = Signal("Normalized Beta", ["efsbetan"], [MachineD3D])
+betan = signal_0d("Normalized Beta", ["efsbetan"], [MachineD3D])
 
 betant = Signal(
     "Normalized Beta tol", ["efsbetan"], [MachineD3D], data_avail_tolerances=[0.029]
 )
 
-energydt = Signal("stored energy time derivative", ["jpf/gs/bl-fdwdt<s"], [MachineJET])
+energydt = signal_0d("stored energy time derivative", ["jpf/gs/bl-fdwdt<s"], [MachineJET])
 
-torquein = Signal("Input Beam Torque", ["/bmstinj"], [MachineD3D])
+torquein = signal_0d("Input Beam Torque", ["/bmstinj"], [MachineD3D])
 
 fs07 = signal_0d("filterscope fs07", ["fs07"], [MachineD3D])
 
@@ -522,19 +522,19 @@ teped = signal_0d("teped", ["prmtan_teped"], [MachineD3D])
 
 tewid = signal_0d("tewid", ["prmtan_tewid"], [MachineD3D])
 
-torqueint = Signal(
+torqueint = signal_0d(
     "Input Beam Torque tol", ["bmstinj"], [MachineD3D], data_avail_tolerances=[0.029]
 )
 
-tmamp1 = Signal("Tearing Mode amplitude (rotating 2/1)", ["nssampn1l"], [MachineD3D])
+tmamp1 = signal_0d("Tearing Mode amplitude (rotating 2/1)", ["nssampn1l"], [MachineD3D])
 
-tmamp2 = Signal("Tearing Mode amplitude (rotating 3/2)", ["nssampn2l"], [MachineD3D])
+tmamp2 = signal_0d("Tearing Mode amplitude (rotating 3/2)", ["nssampn2l"], [MachineD3D])
 
-tmfreq1 = Signal("Tearing Mode frequency (rotating 2/1)", ["nssfrqn1l"], [MachineD3D])
+tmfreq1 = signal_0d("Tearing Mode frequency (rotating 2/1)", ["nssfrqn1l"], [MachineD3D])
 
-tmfreq2 = Signal("Tearing Mode frequency (rotating 3/2)", ["nssfrqn2l"], [MachineD3D])
+tmfreq2 = signal_0d("Tearing Mode frequency (rotating 3/2)", ["nssfrqn2l"], [MachineD3D])
 
-ipdirect = Signal("plasma current direction", ["iptdirect"], [MachineD3D])
+ipdirect = signal_0d("plasma current direction", ["iptdirect"], [MachineD3D])
 
 ipdirectt = Signal(
     "plasma current direction tol",

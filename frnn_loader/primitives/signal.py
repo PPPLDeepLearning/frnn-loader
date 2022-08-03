@@ -27,14 +27,18 @@ class signal_base:
         paths,
         machines,
         causal_shifts=None,
+        is_ip=False,
         data_avail_tolerances=None,
+        is_strictly_positive=False,
         normalize=True,
     ):
         self.description = description
         self.paths = paths
         self.machines = machines
         self.causal_shifts = (causal_shifts,)
-        self.data_avail_tolerances = (data_avail_tolerances,)
+        self_is_ip = is_ip
+        self.data_avail_tolerances = (data_avail_tolerances,),
+        self.is_strictly_positive = is_strictly_positive
         self.normalize = normalize
 
     def load_data(self, shot, machine, backend):
@@ -103,7 +107,9 @@ class signal_0d(signal_base):
         paths,
         machines,
         causal_shifts=None,
+        is_ip=False,
         data_avail_tolerances=None,
+        is_strictly_positive=False,
         normalize=True,
     ):
         super().__init__(
@@ -111,7 +117,9 @@ class signal_0d(signal_base):
             paths,
             machines,
             causal_shifts,
+            is_ip,
             data_avail_tolerances,
+            is_strictly_positive,
             normalize,
         )
         self.num_channels = 1
