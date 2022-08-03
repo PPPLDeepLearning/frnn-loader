@@ -506,7 +506,9 @@ betant = Signal(
     "Normalized Beta tol", ["efsbetan"], [MachineD3D], data_avail_tolerances=[0.029]
 )
 
-energydt = signal_0d("stored energy time derivative", ["jpf/gs/bl-fdwdt<s"], [MachineJET])
+energydt = signal_0d(
+    "stored energy time derivative", ["jpf/gs/bl-fdwdt<s"], [MachineJET]
+)
 
 torquein = signal_0d("Input Beam Torque", ["/bmstinj"], [MachineD3D])
 
@@ -530,9 +532,13 @@ tmamp1 = signal_0d("Tearing Mode amplitude (rotating 2/1)", ["nssampn1l"], [Mach
 
 tmamp2 = signal_0d("Tearing Mode amplitude (rotating 3/2)", ["nssampn2l"], [MachineD3D])
 
-tmfreq1 = signal_0d("Tearing Mode frequency (rotating 2/1)", ["nssfrqn1l"], [MachineD3D])
+tmfreq1 = signal_0d(
+    "Tearing Mode frequency (rotating 2/1)", ["nssfrqn1l"], [MachineD3D]
+)
 
-tmfreq2 = signal_0d("Tearing Mode frequency (rotating 3/2)", ["nssfrqn2l"], [MachineD3D])
+tmfreq2 = signal_0d(
+    "Tearing Mode frequency (rotating 3/2)", ["nssfrqn2l"], [MachineD3D]
+)
 
 ipdirect = signal_0d("plasma current direction", ["iptdirect"], [MachineD3D])
 
