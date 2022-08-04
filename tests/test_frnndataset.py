@@ -30,7 +30,6 @@ class test_frnn_dataset(unittest.TestCase):
             print(item.shape)
 
 
-
 if __name__ == "__main__":
     unittest.main()
 

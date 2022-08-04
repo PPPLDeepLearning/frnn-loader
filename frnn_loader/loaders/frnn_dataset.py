@@ -19,7 +19,7 @@ class shot_dataset(Dataset):
     Args:
         shotnr (int) :
         machine (:obj:`frnn_loader.backend.machines.machine`)
-        signal_list (list) :
+        predictors (list) :
         resampler (resampler) : Re-sampler to use
         backend_file (backend) : Backend to use for loading data from the file system
         backend_fetcher (fetcher) : Data fetcher to use when downloading data
@@ -34,7 +34,7 @@ class shot_dataset(Dataset):
         self,
         shotnr,
         machine,
-        signal_list,
+        predictors,
         resampler,
         backend_file,
         backend_fetcher=None,
@@ -44,7 +44,7 @@ class shot_dataset(Dataset):
         """Initializes the shot dataset."""
         self.shotnr = shotnr
         self.machine = machine
-        self.signal_list = signal_list
+        self.predictors = predictors
         self.resampler = resampler
         self.backend_file = backend_file
         self.backend_fetcher = backend_fetcher
@@ -57,10 +57,10 @@ class shot_dataset(Dataset):
             assert self.backend_fetcher is not None
 
         # signal_dict is a dict with
-        # Keys: signals defined in signal_list
+        # Keys: signals defined in predictors
         # Values: Signal samples interpolated on a common time-base.
         # It is populated by self._preprocess()
-        self.total_channels = sum([sig.num_channels for sig in self.signal_list])
+        self.total_channels = sum([sig.num_channels for sig in self.predictors])
         self.signal_tensor = torch.zeros(
             (len(self.resampler), self.total_channels), dtype=self.dtype
         )
@@ -89,14 +89,14 @@ class shot_dataset(Dataset):
         # resample signals on a common time-base
         assert len(signal_arrays) > 0
         assert len(signal_arrays) == len(time_arrays)
-        assert len(signal_arrays) == len(self.signal_list)
+        assert len(signal_arrays) == len(self.predictors)
 
         # Re-sample each signal individually
         # Store the re-sampled signal in a tensor
         logging.info(f"Resmapling shot {self.shotnr}")
         # Keep track of how many channels a signal has used
         curr_channel = 0
-        for (i, signal) in enumerate(self.signal_list):
+        for (i, signal) in enumerate(self.predictors):
             # Cut the signal to [t_min:t_max]
             good_idx = (time_arrays[i] >= t_min) & (time_arrays[i] <= t_max)
             tb = time_arrays[i][good_idx]
@@ -136,7 +136,7 @@ class shot_dataset(Dataset):
         invalid_signals = 0  # Counts the number of invalid signals for this shot
 
         # Iterate over all signals and extract data
-        for signal in self.signal_list:
+        for signal in self.predictors:
             # Try loading the signal. When this fails, append dummy data.
             try:
                 tb, signal_data = self.backend_file.load(
