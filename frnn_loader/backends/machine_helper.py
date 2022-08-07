@@ -27,12 +27,4 @@ def get_tree_and_tag(path):
     return tree, tag
 
 
-def get_tree_and_tag_no_backslash(path):
-    """Fetch tree and tag from path, removing backslash"""
-    spl = path.split("/")
-    tree = spl[0]
-    tag = spl[1]
-    return tree, tag
-
-
 # End of file machine_helper.py

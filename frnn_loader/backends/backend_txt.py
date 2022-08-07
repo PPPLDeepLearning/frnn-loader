@@ -21,12 +21,11 @@ class backend_txt:
         self.root = root
         self.dtype = dtype
 
-    def load(self, machine, sig, shotnr):
+    def load(self, sig_info, shotnr):
         """Loads a specified signal for a given shot on a machine.
 
         Args:
-            machine (machine) : Which machine to load for
-            sig (signal) : Type of signal to load
+            sig_info (Dict) : Dictionary generated from signal yaml file
             shotnr (int) : Shot number
 
         Returns:
@@ -41,27 +40,17 @@ class backend_txt:
         # Construct the path where a signal is stored for the specified machine
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
-        try:
-            base_path = join(
-                self.root, machine.name, sig.paths[sig.machines.index(machine)]
-            )
-        except ValueError as err:
-            logging.error(
-                "Error fetching signal {sig} for machine {machine}, shotnr {shotnr}: {err}"
-            )
-            raise err
-
-        file_path = join(base_path, f"{shotnr}.txt")
+        file_path = join(self.root, sig_info["Machine"], sig_info["LocalPath"], f"{shotnr}.txt")
 
         # Perform checks to see that the file is good.
         if not isfile(file_path):
             raise NotDownloadedError(
-                f"Signal {sig.description}, shot {shotnr} was never downloaded: {file_path} does not exist"
+                f"Signal {sig_info['Description']}, shot {shotnr} was never downloaded: {file_path} does not exist"
             )
 
         if getsize(file_path) == 0:
             raise SignalCorruptedError(
-                f"Signal {sig.description}, shot {shotnr} was downloaded incorrectly (empty file). Removing."
+                f"Signal {sig_info['description']}, shot {shotnr} has size==0. Removing."
             )
 
         # Load manually into a list and convert to torch.tensor
@@ -74,6 +63,10 @@ class backend_txt:
         # First column is the timebase
         # After second column is the signal data
         return data[:, 0], data[:, 1:]
+
+
+    def store(self, sig_info, shot, data):
+        pass
 
 
 # end of file backend_txt.py

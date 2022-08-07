@@ -10,10 +10,10 @@ machines.
 import numpy as np
 import sys
 
-from frnn_loader.primitives.signal import Signal
+#from frnn_loader.primitives.signal import Signal
 from frnn_loader.primitives.signal import signal_0d
-from frnn_loader.primitives.profilesignal import ProfileSignal
-from frnn_loader.primitives.channelsignal import ChannelSignal
+#from frnn_loader.primitives.profilesignal import ProfileSignal
+# from frnn_loader.primitives.channelsignal import ChannelSignal
 
 from frnn_loader.backends.machine import MachineD3D, MachineNSTX, MachineJET
 
@@ -26,181 +26,181 @@ profile_num_channels = 128
 # ZIPFIT comes from actual measurements
 # jet and d3d:
 # Define ProfileSignal objects for various signals
-edens_profile_thomson = ProfileSignal(
-    "Electron density profile Thomson Scattering",
-    ["ELECTRONS/TS.BLESSED.CORE.DENSITY"],
-    [MachineD3D],
-    mapping_paths=[None],
-    causal_shifts=[0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.029],
-)
+# edens_profile_thomson = ProfileSignal(
+#     "Electron density profile Thomson Scattering",
+#     ["ELECTRONS/TS.BLESSED.CORE.DENSITY"],
+#     [MachineD3D],
+#     mapping_paths=[None],
+#     causal_shifts=[0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.029],
+# )
 
-qpsi_efitrt2 = ProfileSignal(
-    "q profile efitrt2",
-    ["EFITRT2/RESULTS.GEQDSK.QPSI"],
-    [MachineD3D],
-    mapping_paths=[None],
-    causal_shifts=[0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.029],
-)
+# qpsi_efitrt2 = ProfileSignal(
+#     "q profile efitrt2",
+#     ["EFITRT2/RESULTS.GEQDSK.QPSI"],
+#     [MachineD3D],
+#     mapping_paths=[None],
+#     causal_shifts=[0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.029],
+# )
 
-qpsi_efit01 = ProfileSignal(
-    "q profile efit01",
-    ["EFIT01/RESULTS.GEQDSK.QPSI"],
-    [MachineD3D],
-    mapping_paths=[None],
-    causal_shifts=[0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.029],
-)
+# qpsi_efit01 = ProfileSignal(
+#     "q profile efit01",
+#     ["EFIT01/RESULTS.GEQDSK.QPSI"],
+#     [MachineD3D],
+#     mapping_paths=[None],
+#     causal_shifts=[0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.029],
+# )
 
-qpsi_efitrt1 = ProfileSignal(
-    "q profile efitrt1",
-    ["EFITRT1/RESULTS.GEQDSK.QPSI"],
-    [MachineD3D],
-    mapping_paths=[None],
-    causal_shifts=[0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.029],
-)
+# qpsi_efitrt1 = ProfileSignal(
+#     "q profile efitrt1",
+#     ["EFITRT1/RESULTS.GEQDSK.QPSI"],
+#     [MachineD3D],
+#     mapping_paths=[None],
+#     causal_shifts=[0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.029],
+# )
 
-etemp_profile_thomson = ProfileSignal(
-    "Electron temperature profile Thomson Scattering",
-    ["ELECTRONS/TS.BLESSED.CORE.TEMP"],
-    [MachineD3D],
-    mapping_paths=[None],
-    causal_shifts=[0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.029],
-)
+# etemp_profile_thomson = ProfileSignal(
+#     "Electron temperature profile Thomson Scattering",
+#     ["ELECTRONS/TS.BLESSED.CORE.TEMP"],
+#     [MachineD3D],
+#     mapping_paths=[None],
+#     causal_shifts=[0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.029],
+# )
 
-edens_profile = ProfileSignal(
-    "Electron density profile",
-    ["ppf/hrts/ne", "ZIPFIT01/PROFILES.EDENSFIT"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.02],
-)
+# edens_profile = ProfileSignal(
+#     "Electron density profile",
+#     ["ppf/hrts/ne", "ZIPFIT01/PROFILES.EDENSFIT"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.02],
+# )
 
-etemp_profile = ProfileSignal(
-    "Electron temperature profile",
-    ["ppf/hrts/te", "ZIPFIT01/PROFILES.ETEMPFIT"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.02],
-)
+# etemp_profile = ProfileSignal(
+#     "Electron temperature profile",
+#     ["ppf/hrts/te", "ZIPFIT01/PROFILES.ETEMPFIT"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.02],
+# )
 
-pres_prime_profile = ProfileSignal(
-    "Pressure gradient profile",
-    ["ppf/hrts/te", "EFITRT1/RESULTS.GEQDSK.PRES"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 0],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.02],
-)
+# pres_prime_profile = ProfileSignal(
+#     "Pressure gradient profile",
+#     ["ppf/hrts/te", "EFITRT1/RESULTS.GEQDSK.PRES"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 0],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.02],
+# )
 
-mpi66m322d_spec_profile = ProfileSignal(
-    "mpi66m322d_spectrogram",
-    ["", "mpi66m322d_spec"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 2.58],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.02],
-)
+# mpi66m322d_spec_profile = ProfileSignal(
+#     "mpi66m322d_spectrogram",
+#     ["", "mpi66m322d_spec"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 2.58],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.02],
+# )
 
-etemp_profilet = ProfileSignal(
-    "Electron temperature profile tol",
-    ["ppf/hrts/te", "ZIPFIT01/PROFILES.ETEMPFIT"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.029],
-)
+# etemp_profilet = ProfileSignal(
+#     "Electron temperature profile tol",
+#     ["ppf/hrts/te", "ZIPFIT01/PROFILES.ETEMPFIT"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.029],
+# )
 
-edens_profilet = ProfileSignal(
-    "Electron density profile tol",
-    ["ppf/hrts/ne", "ZIPFIT01/PROFILES.EDENSFIT"],
-    [MachineJET, MachineD3D],
-    mapping_paths=["ppf/hrts/rho", None],
-    causal_shifts=[0, 10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05, 0.029],
-)
+# edens_profilet = ProfileSignal(
+#     "Electron density profile tol",
+#     ["ppf/hrts/ne", "ZIPFIT01/PROFILES.EDENSFIT"],
+#     [MachineJET, MachineD3D],
+#     mapping_paths=["ppf/hrts/rho", None],
+#     causal_shifts=[0, 10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05, 0.029],
+# )
 
-itemp_profile = ProfileSignal(
-    "Ion temperature profile",
-    ["ZIPFIT01/PROFILES.ITEMPFIT"],
-    [MachineD3D],
-    causal_shifts=[10],
-    mapping_range=(0, 1),
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# itemp_profile = ProfileSignal(
+#     "Ion temperature profile",
+#     ["ZIPFIT01/PROFILES.ITEMPFIT"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     mapping_range=(0, 1),
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-zdens_profile = ProfileSignal(
-    "Impurity density profile",
-    ["ZIPFIT01/PROFILES.ZDENSFIT"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# zdens_profile = ProfileSignal(
+#     "Impurity density profile",
+#     ["ZIPFIT01/PROFILES.ZDENSFIT"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-trot_profile = ProfileSignal(
-    "Rotation profile",
-    ["ZIPFIT01/PROFILES.TROTFIT"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# trot_profile = ProfileSignal(
+#     "Rotation profile",
+#     ["ZIPFIT01/PROFILES.TROTFIT"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-# note, thermal pressure doesn't include fast ions
-pthm_profile = ProfileSignal(
-    "Thermal pressure profile",
-    ["ZIPFIT01/PROFILES.PTHMFIT"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# # note, thermal pressure doesn't include fast ions
+# pthm_profile = ProfileSignal(
+#     "Thermal pressure profile",
+#     ["ZIPFIT01/PROFILES.PTHMFIT"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-neut_profile = ProfileSignal(
-    "Neutrals profile",
-    ["ZIPFIT01/PROFILES.NEUTFIT"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# neut_profile = ProfileSignal(
+#     "Neutrals profile",
+#     ["ZIPFIT01/PROFILES.NEUTFIT"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-# compare the following profile to just q95 0D signal
-q_profile = ProfileSignal(
-    "Q profile",
-    ["ZIPFIT01/PROFILES.BOOTSTRAP.QRHO"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# # compare the following profile to just q95 0D signal
+# q_profile = ProfileSignal(
+#     "Q profile",
+#     ["ZIPFIT01/PROFILES.BOOTSTRAP.QRHO"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
-bootstrap_current_profile = ProfileSignal(
-    "Rotation profile",
-    ["ZIPFIT01/PROFILES.BOOTSTRAP.JBS_SAUTER"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# bootstrap_current_profile = ProfileSignal(
+#     "Rotation profile",
+#     ["ZIPFIT01/PROFILES.BOOTSTRAP.JBS_SAUTER"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
 # EFIT is the solution to the inverse problem from external magnetic
 # measurements
@@ -208,48 +208,48 @@ bootstrap_current_profile = ProfileSignal(
 # pressure might be unphysical since it is not constrained by measurements,
 # only the EFIT which does not know about density and temperature
 
-q_psi_profile = ProfileSignal(
-    "Q(psi) profile",
-    ["EFIT01/RESULTS.GEQDSK.QPSI"],
-    [MachineD3D],
-    causal_shifts=[10],
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.02],
-)
+# q_psi_profile = ProfileSignal(
+#     "Q(psi) profile",
+#     ["EFIT01/RESULTS.GEQDSK.QPSI"],
+#     [MachineD3D],
+#     causal_shifts=[10],
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.02],
+# )
 
 # epress_profile_spatial = ProfileSignal(
 #     "Electron pressure profile", ["ppf/hrts/pe/"], [MachineJET], causal_shifts=[25],
 #     mapping_range=(2, 4), num_channels=profile_num_channels)
 
-etemp_profile_spatial = ProfileSignal(
-    "Electron temperature profile",
-    ["ppf/hrts/te"],
-    [MachineJET],
-    causal_shifts=[0],
-    mapping_range=(2, 4),
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05],
-)
+# etemp_profile_spatial = ProfileSignal(
+#     "Electron temperature profile",
+#     ["ppf/hrts/te"],
+#     [MachineJET],
+#     causal_shifts=[0],
+#     mapping_range=(2, 4),
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05],
+# )
 
-edens_profile_spatial = ProfileSignal(
-    "Electron density profile",
-    ["ppf/hrts/ne"],
-    [MachineJET],
-    causal_shifts=[0],
-    mapping_range=(2, 4),
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05],
-)
+# edens_profile_spatial = ProfileSignal(
+#     "Electron density profile",
+#     ["ppf/hrts/ne"],
+#     [MachineJET],
+#     causal_shifts=[0],
+#     mapping_range=(2, 4),
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05],
+# )
 
-rho_profile_spatial = ProfileSignal(
-    "Rho at spatial positions",
-    ["ppf/hrts/rho"],
-    [MachineJET],
-    causal_shifts=[0],
-    mapping_range=(2, 4),
-    num_channels=profile_num_channels,
-    data_avail_tolerances=[0.05],
-)
+# rho_profile_spatial = ProfileSignal(
+#     "Rho at spatial positions",
+#     ["ppf/hrts/rho"],
+#     [MachineJET],
+#     causal_shifts=[0],
+#     mapping_range=(2, 4),
+#     num_channels=profile_num_channels,
+#     data_avail_tolerances=[0.05],
+# )
 
 etemp = signal_0d(
     "electron temperature",
@@ -362,16 +362,17 @@ iperrt = signal_0d(
     data_avail_tolerances=[0.029],
 )
 
-li = signal_0d(
-    "internal inductance", ["jpf/gs/bl-li<s", "efsli"], [MachineJET, MachineD3D]
-)
+# searching for efsli gives errors: conn.get('findsig("efsli"),_fstree')
+#li = signal_0d(
+#    "internal inductance", ["jpf/gs/bl-li<s", "efsli"], [MachineJET, MachineD3D]
+#)
 
-lit = signal_0d(
-    "internal inductance tol",
-    ["jpf/gs/bl-li<s", "efsli"],
-    [MachineJET, MachineD3D],
-    data_avail_tolerances=[0.029, 0.029],
-)
+# lit = signal_0d(
+#     "internal inductance tol",
+#     ["jpf/gs/bl-li<s", "efsli"],
+#     [MachineJET, MachineD3D],
+#     data_avail_tolerances=[0.029, 0.029],
+# )
 
 lm = signal_0d(
     "Locked mode amplitude", ["jpf/da/c2-loca", "dusbradial"], [MachineJET, MachineD3D]
@@ -463,31 +464,31 @@ pradtott = signal_0d(
     data_avail_tolerances=[0.029],
 )
 
-pradcore = ChannelSignal(
-    "Radiated Power Core",
-    ["ppf/bolo/kb5h/channel14", "/" + r"\bol_l15_p"],
-    [MachineJET, MachineD3D],
-)
+# pradcore = ChannelSignal(
+#     "Radiated Power Core",
+#     ["ppf/bolo/kb5h/channel14", "/" + r"\bol_l15_p"],
+#     [MachineJET, MachineD3D],
+# )
 
-pradedge = ChannelSignal(
-    "Radiated Power Edge",
-    ["ppf/bolo/kb5h/channel10", "/" + r"\bol_l03_p"],
-    [MachineJET, MachineD3D],
-)
+# pradedge = ChannelSignal(
+#     "Radiated Power Edge",
+#     ["ppf/bolo/kb5h/channel10", "/" + r"\bol_l03_p"],
+#     [MachineJET, MachineD3D],
+# )
 
-pradcoret = ChannelSignal(
-    "Radiated Power Core tol",
-    ["ppf/bolo/kb5h/channel14", "/" + r"\bol_l15_p"],
-    [MachineJET, MachineD3D],
-    data_avail_tolerances=[0.029, 0.029],
-)
+# pradcoret = ChannelSignal(
+#     "Radiated Power Core tol",
+#     ["ppf/bolo/kb5h/channel14", "/" + r"\bol_l15_p"],
+#     [MachineJET, MachineD3D],
+#     data_avail_tolerances=[0.029, 0.029],
+# )
 
-pradedget = ChannelSignal(
-    "Radiated Power Edge tol",
-    ["ppf/bolo/kb5h/channel10", "/" + r"\bol_l03_p"],
-    [MachineJET, MachineD3D],
-    data_avail_tolerances=[0.029, 0.029],
-)
+# pradedget = ChannelSignal(
+#     "Radiated Power Edge tol",
+#     ["ppf/bolo/kb5h/channel10", "/" + r"\bol_l03_p"],
+#     [MachineJET, MachineD3D],
+#     data_avail_tolerances=[0.029, 0.029],
+# )
 
 pechin = signal_0d(
     "ECH input power, not always on", ["RF/ECH.TOTAL.ECHPWRC"], [MachineD3D]
@@ -502,7 +503,7 @@ pechint = signal_0d(
 
 betan = signal_0d("Normalized Beta", ["efsbetan"], [MachineD3D])
 
-betant = Signal(
+betant = signal_0d(
     "Normalized Beta tol", ["efsbetan"], [MachineD3D], data_avail_tolerances=[0.029]
 )
 
@@ -542,7 +543,7 @@ tmfreq2 = signal_0d(
 
 ipdirect = signal_0d("plasma current direction", ["iptdirect"], [MachineD3D])
 
-ipdirectt = Signal(
+ipdirectt = signal_0d(
     "plasma current direction tol",
     ["/ptdirect"],
     [MachineD3D],
@@ -563,56 +564,56 @@ ipdirectt = Signal(
 # dataset.
 signal_group_gar18 = {
     "q95t": q95t,
-    "lit": lit,
+    #"lit": lit,
     "ipt": ipt,
     "betant": betant,
     "energyt": energyt,
     "lmt": lmt,
     "denst": denst,
-    "pradcoret": pradcoret,
-    "pradedget": pradedget,
+    #"pradcoret": pradcoret,
+    #"pradedget": pradedget,
     "pint": pint,
     "torqueint": torqueint,
     "ipdirectt": ipdirectt,
     "iptargett": iptargett,
-    "iperrt": iperrt,
-    "etemp_profilet": etemp_profilet,
-    "edens_profilet": edens_profilet,
+    "iperrt": iperrt
+    #"etemp_profilet": etemp_profilet,
+    #"edens_profilet": edens_profilet,
 }
 
 signal_group_real_time = {
     "q95_EFITRT1": q95_EFITRT1,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
+    "iperr": iperr
     # 'tmamp1':tmamp1, 'tmamp2':tmamp2, 'tmfreq1':tmfreq1, 'tmfreq2':tmfreq2,
     # 'pechin':pechin,
     # 'rho_profile_spatial':rho_profile_spatial, 'etemp':etemp,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 signal_group_real_time_0D = {
     "q95_EFITRT1": q95_EFITRT1,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
@@ -628,26 +629,26 @@ signal_group_real_time_0D = {
 
 signal_group_all = {
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
+    "iperr": iperr
     # 'tmamp1':tmamp1, 'tmamp2':tmamp2, 'tmfreq1':tmfreq1, 'tmfreq2':tmfreq2,
     # 'pechin':pechin,
     # 'rho_profile_spatial':rho_profile_spatial, 'etemp':etemp,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
     # 'itemp_profile':itemp_profile, 'zdens_profile':zdens_profile,
     # 'trot_profile':trot_profile, 'pthm_profile':pthm_profile,
     # 'neut_profile':neut_profile, 'q_profile':q_profile,
@@ -656,109 +657,109 @@ signal_group_all = {
 }
 signal_group_ori = {
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ipori": ipori,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    "iperr": iperr
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 signal_group_n1rms = {
     "n1_rms_no_shift": n1_rms_no_shift,
     "n1_rms": n1_rms,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    "iperr": iperr
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 signal_group_n1rms_thomson = {
     "n1_rms_no_shift": n1_rms_no_shift,
     "n1_rms": n1_rms,
     "q95_EFITRT1": q95_EFITRT1,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
+    "iperr": iperr
     # 'qpsi_efitrt2':qpsi_efitrt2,
-    "etemp_profile_thomson": etemp_profile_thomson,
-    "edens_profile_thomson": edens_profile_thomson,
+    #"etemp_profile_thomson": etemp_profile_thomson,
+    #"edens_profile_thomson": edens_profile_thomson,
 }
 
 signal_group_fs07 = {
     "n1_rms_no_shift": n1_rms_no_shift,
     "n1_rms": n1_rms,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
+    #"pradcore": pradcore,
     "fs07": fs07,
-    "pradedge": pradedge,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    "iperr": iperr
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 signal_group_ped_old_2021 = {
     "n1_rms_no_shift": n1_rms_no_shift,
     "n1_rms": n1_rms,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
+    #"pradcore": pradcore,
     "fs07": fs07,
-    "pradedge": pradedge,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
@@ -770,9 +771,9 @@ signal_group_ped_old_2021 = {
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    "iperr": iperr
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 signal_group_ped = {
@@ -780,15 +781,15 @@ signal_group_ped = {
     "n2_rms_10": n2_rms_10,
     "n3_rms_10": n3_rms_10,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
+    #"pradcore": pradcore,
     "fs07": fs07,
-    "pradedge": pradedge,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
@@ -798,10 +799,10 @@ signal_group_ped = {
     "peped": peped,
     "tewid": tewid,
     # 'energydt': energydt, 'ipdirect': ipdirect,
-    "iptarget": iptarget,
+    "iptarget": iptarget
     # 'iperr': iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 
@@ -811,15 +812,15 @@ signal_group_ped_spec = {
     "n2_rms_10": n2_rms_10,
     "n3_rms_10": n3_rms_10,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
+    #"pradcore": pradcore,
     "fs07": fs07,
-    "pradedge": pradedge,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
@@ -828,11 +829,11 @@ signal_group_ped_spec = {
     "newid": newid,
     "peped": peped,
     "tewid": tewid,
-    "iptarget": iptarget,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
-    "mpi66m322d_spec_profile": mpi66m322d_spec_profile,
-    "qpsi_efitrt1": qpsi_efitrt1,
+    "iptarget": iptarget
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
+    #"mpi66m322d_spec_profile": mpi66m322d_spec_profile,
+    #"qpsi_efitrt1": qpsi_efitrt1,
 }
 
 
@@ -841,44 +842,44 @@ signal_group_n1rms_qmin = {
     "n1_rms_no_shift": n1_rms_no_shift,
     "n1_rms": n1_rms,
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile": etemp_profile,
-    "edens_profile": edens_profile,
+    "iperr": iperr
+    #"etemp_profile": etemp_profile,
+    #"edens_profile": edens_profile,
 }
 
 signal_group_thomson = {
     "q95": q95,
-    "li": li,
+    #"li": li,
     "ip": ip,
     "betan": betan,
     "energy": energy,
     "lm": lm,
     "dens": dens,
-    "pradcore": pradcore,
-    "pradedge": pradedge,
+    #"pradcore": pradcore,
+    #"pradedge": pradedge,
     "pradtot": pradtot,
     "pin": pin,
     "torquein": torquein,
     "energydt": energydt,
     "ipdirect": ipdirect,
     "iptarget": iptarget,
-    "iperr": iperr,
-    "etemp_profile_thomson": etemp_profile_thomson,
-    "edens_profile_thomson": edens_profile_thomson,
+    "iperr": iperr
+    #"etemp_profile_thomson": etemp_profile_thomson,
+    #"edens_profile_thomson": edens_profile_thomson,
 }
 
 

@@ -13,9 +13,7 @@ import logging
 from frnn_loader.utils.errors import SignalNotFoundError
 from frnn_loader.backends.machine_helper import (
     create_missing_value_filler,
-    get_tree_and_tag,
-    get_tree_and_tag_no_backslash,
-)
+    get_tree_and_tag)
 
 
 class Machine:
@@ -94,10 +92,10 @@ class MachineNSTX(Machine):
         """
         assert shot_num > 0
 
-        tree, tag = get_tree_and_tag(signal_path)
+        tree, tag = signal_path.split("/")
         c.openTree(tree, shot_num)
         data = c.get(tag).data()
-        time = c.get("dim_of(" + tag + ")").data()
+        time = c.get(f"dim_of({tag})").data()
 
         return time, data
 

@@ -1,0 +1,69 @@
+
+---
+# A list of D3D signals
+
+
+dens:
+  Machine: D3D
+  Description: Plasma Density
+  PTData: dssdenest
+  LocalPath: dssdenest
+
+fs07:
+  Machine: D3D
+  Description: Filterscope FS07
+  MDSTree: D3D
+  MDSPath: SPECTROSCOPY.FILTERSCOPE.PMT15:PHOTON_FLUX
+  LocalPath: fs07
+
+q95:
+  Machine: D3D
+  Description: Q95 safety factor
+  MDSTree: EFIT01
+  MDSPath: RESULTS.AEQDSK:Q95
+  LocalPath: q95
+
+qmin:
+  Machine: D3D
+  Description: Minimum safety factor
+  MDSTree: EFITRT1
+  MDSPath: RESULTS.AEQDSK.QMIN
+  LocalPath: qmin
+
+
+
+
+
+
+
+
+
+
+
+
+# Untested below
+edens_profile_thomson:
+  Machine: D3D
+  Description: Thomson Scattering Electron Density Profile
+  MDSTree: D3D
+  MDSpath: ELECTRONS.TS.BLESSED.CORE:DENSITY
+  LocalPath: edens_profile_thomson
+
+n1_rms_no_shift:
+  Machine: D3D
+  MDSTree: D3D
+  MDSpath: TOP.MHD.MIRNOV:N1RMS
+
+
+
+li:
+  Machine: D3D
+
+ip:
+  Machine: D3D
+  PTdata: ipspr15V
+
+ipt:
+  Machine: D3D
+  PTdata: ipsip
+
