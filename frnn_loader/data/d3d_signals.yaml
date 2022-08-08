@@ -30,40 +30,115 @@ qmin:
   MDSPath: RESULTS.AEQDSK.QMIN
   LocalPath: qmin
 
-
-
-
-
-
-
-
-
-
-
-
-# Untested below
-edens_profile_thomson:
-  Machine: D3D
-  Description: Thomson Scattering Electron Density Profile
-  MDSTree: D3D
-  MDSpath: ELECTRONS.TS.BLESSED.CORE:DENSITY
-  LocalPath: edens_profile_thomson
-
-n1_rms_no_shift:
-  Machine: D3D
-  MDSTree: D3D
-  MDSpath: TOP.MHD.MIRNOV:N1RMS
-
-
-
 li:
   Machine: D3D
+  Description: Internal inductance
+  PTData: efsli
+  LocalPath: efsli
 
 ip:
   Machine: D3D
-  PTdata: ipspr15V
+  Description: Plasma Current
+  PTData: ipspr15V
+  LocalPath: ipspr15V
 
-ipt:
+betan:
   Machine: D3D
-  PTdata: ipsip
+  Description: Normalized beta
+  PTData: efsbetan
+  LocalPath: efsbetan
+
+energy:
+  Machine: D3D
+  Description: Stored Energy
+  PTData: efswmhd
+  LocalPath: efswmhd
+
+lm:
+  Machine: D3D
+  Description: Locked Mode Amplitude
+  PTData: dusbradial
+  LocalPath: dusbradial
+
+pradcore:
+  Machine: D3D
+  Description: Radiated Power Core
+  MDSTree: D3D
+  MDSPath: SPECTROSCOPY.PRAD.BOLOM.PRAD_01.POWER:BOL_L15_P
+  LocalPath: bol_l15_p
+
+pradedge:
+  Machine: D3D
+  Description: Radiated Power Edge
+  MDSTree: D3D
+  MDSPath: SPECTROSCOPY.PRAD.BOLOM.PRAD_01.POWER:BOL_L03_P
+  LocalPath: bol_l03_p
+
+bmspinj:
+  Machine: D3D
+  Description: Beam input power
+  PTData: bmspinj
+  LocalPath: bmspinj
+
+bmstinj:
+  Machine: D3D
+  Description: Beam input torque
+  PTData: bmstinj
+  LocalPath: bmstinj
+
+iptdirect:
+  Machine: D3D
+  Description: Plasma current direction
+  PTData: iptdirect
+  LocalPath: iptdirect
+
+iptarget:
+  Machine: D3D
+  Description: Plasma current target
+  PTData: ipsiptargt
+  LocalPath: ipsiptargt
+
+tmamp1:
+  Machine: D3D
+  Description: Tearing Mode amplitude, rotating 2/1
+  PTData: nssampn1l
+  LocalPath: nssampn1l
+
+tmamp2:
+  Machine: D3D
+  Description: Tearing Mode amplitude, rotating 3/2
+  PTData: nssampn2l
+  LocalPath: nssampn2l
+
+tmfreq1:
+  Machine: D3D
+  Description: Tearing Mode frequency, rotating 2/1
+  PTData: nssfrqn1l
+  LocalPath: nssfrqn1l
+
+tmfreq2:
+  Machine: D3D
+  Description: Tearing Mode frequency, rotating 3/2
+  PTData: nssfrqn1l
+  LocalPath: nssfrqn1l
+
+etemp_profile:
+  Machine: D3D
+  Description: Electron temperature profile
+  MDSTree: ZIPFIT01
+  MDSPath: PROFILES:ETEMPFIT
+  LocalPath: etemp_profile
+
+edens_profile:
+  Machine: D3D
+  Description: Electron density profile
+  MDSTree: ZIPFIT01
+  MDSPath: PROFILES:EDENSFIT
+  LocalPath: edens_profile
+
+
+
+
+
+
 

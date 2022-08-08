@@ -21,7 +21,12 @@ class TestSignals(unittest.TestCase):
         fs07.load_data(184800, my_backend)
 
     def test_signals_0d(self):
-        sig_names = ["dens", "fs07", "q95", "qmin"]
+        # Bad: pradedge
+        sig_names = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
+                     "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "iptarget",
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2",
+                     "etemp_profile"]
         my_backend = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021")
         my_fetcher = fetcher_d3d_v1()
 

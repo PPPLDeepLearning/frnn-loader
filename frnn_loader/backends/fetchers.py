@@ -69,6 +69,7 @@ class fetcher_d3d_v1():
             xunits = self.conn.get("units_of(dim_of(_s))").data()
 
             if zdata.ndim > 1:
+                print("MDS ")
                 ydata = self.conn.get("dim_of(_s, 1)").data()
                 yunits = self.conn.get("units_of(dim_of(_s, 1)").data()
                 if ydata.ndim == 2:
