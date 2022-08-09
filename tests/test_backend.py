@@ -4,10 +4,8 @@
 import unittest
 
 import torch
-from frnn_loader.primitives.shots import Shot
-from frnn_loader.backends.machine import MachineD3D
 from frnn_loader.backends.backend_txt import backend_txt
-from frnn_loader.data.user_signals import q95, fs07, d3d_signals
+from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.utils.errors import NotDownloadedError
 
 
@@ -15,21 +13,25 @@ class test_backend_txt(unittest.TestCase):
     """Test routines for machines."""
     def test_backend_txt(self):
         """Test whether we can load data from the txt backend"""
-        my_shot = Shot(184800, MachineD3D, [q95, fs07], torch.float32)
         my_backend = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021")
+        shotnr = 184800
 
-        for descr, sig in d3d_signals.items():
+        # Iterate over data that has been downloaded.
+        for sig_name in ["fs07"]:
+            # Instantiate a signal
+            signal = signal_0d(sig_name)
+            # Try using the backend to access the data for the given signal and shot
             try:
-                tb, signal = my_backend.load(MachineD3D(), sig, my_shot.number)
+                tb, data = my_backend.load(signal.info, shotnr)
             except NotDownloadedError as err:
                 print(f"{err}")
                 continue
 
-            print(f"Got signal {sig}. tb.shape = ", tb.shape, ", signal.shape = ", signal.shape)
+            print(f"Got signal {signal}. tb.shape = ", tb.shape, ", data.shape = ", data.shape)
 
             # Let's see if any data is inf or nan
-            assert(torch.any(signal == torch.inf).item() is False)
-            assert(torch.any(signal == torch.nan).item() is False)
+            assert(torch.any(torch.isinf(data)).item() is False)
+            assert(torch.any(torch.isnan(data))).item() is False)
 
 
 if __name__ == "__main__":

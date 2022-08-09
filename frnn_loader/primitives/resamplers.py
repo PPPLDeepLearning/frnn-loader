@@ -46,9 +46,9 @@ class resampler:
         for i in range(num_channels):
             sig_new[:, i] = self._interp(sig[:, i], tb, tb_new)
 
-        if torch.any(sig_new == torch.nan).item():
+        if torch.any(torch.isnan(sig_new)).item():
             raise ValueError("Resampled signal contains NaN")
-        if torch.any(sig_new == torch.inf).item():
+        if torch.any(torch.isinf(sig_new)).item():
             raise ValueError("Resampled signal contains Inf")
 
         return tb_new, sig_new
@@ -77,8 +77,9 @@ class resampler_last(resampler):
     def _interp(self, sig_old, tb_old, tb_new):
         # This is a pure conversion from numpy to torch library calls
         # of the original function `time_sensitive_interp`.
+
         idx = torch.maximum(
-            torch.tensor([0]), torch.searchsorted(tb_old, tb_new, side="right") - 1
+            torch.tensor([0]), torch.searchsorted(tb_old, tb_new, right=True) - 1
         )
         return sig_old[idx]
 

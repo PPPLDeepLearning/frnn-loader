@@ -33,7 +33,6 @@ class shot_dataset(Dataset):
     def __init__(
         self,
         shotnr,
-        machine,
         predictors,
         resampler,
         backend_file,
@@ -43,7 +42,6 @@ class shot_dataset(Dataset):
     ):
         """Initializes the shot dataset."""
         self.shotnr = shotnr
-        self.machine = machine
         self.predictors = predictors
         self.resampler = resampler
         self.backend_file = backend_file
@@ -128,8 +126,8 @@ class shot_dataset(Dataset):
             BadShotException: Multiple possibilities
 
         """
-        t_min = -torch.inf  # Smallest time in all time bases
-        t_max = torch.inf  # Largest time in all time bases
+        t_min = -1e9  # Smallest time in all time bases
+        t_max = 1e9  # Largest time in all time bases
         # t_thresh = -1
         signal_arrays = []  # To be populated with a list of ndarrays with shot data
         tb_arrays = []  # To be populated with a list of ndarrays, containing time bases
@@ -139,8 +137,7 @@ class shot_dataset(Dataset):
         for signal in self.predictors:
             # Try loading the signal. When this fails, append dummy data.
             try:
-                tb, signal_data = self.backend_file.load(
-                    self.machine, signal, self.shotnr
+                tb, signal_data = self.backend_file.load(signal.info, self.shotnr
                 )
 
             except SignalCorruptedError as err:

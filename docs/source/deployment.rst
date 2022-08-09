@@ -11,7 +11,7 @@ To deploy `frnn-loader` on traverse we first need to create a conda environment 
     $ conda create --name frnn python=3.10
     # conda activate frnn
 
-Pytorch can be installed from `source https://github.com/pytorch/pytorch#from-source`_ :
+Pytorch can be installed from source `https://github.com/pytorch/pytorch#from-source`_ :
 
     $ git clone --recursive https://github.com/pytorch/pytorch
     $ pip install astunparse numpy ninja pyyaml setuptools cmake cffi typing_extensions future six requests dataclasses
@@ -45,6 +45,9 @@ Finally, fetch `frnn-loader`, install the requirements and the package
     $ pip install -r requirements.txt 
     $ python setup.py -e install
 
+As a first step, try and run the unit test 
+
+    $ python -m unittest tests 
 
 
 

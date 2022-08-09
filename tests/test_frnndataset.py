@@ -4,12 +4,10 @@
 import unittest
 
 import torch
-from frnn_loader.backends.machine import MachineD3D
-from frnn_loader.data.user_signals import fs07, ip, q95, neped
-
 
 from frnn_loader.primitives.resamplers import resampler_last
 from frnn_loader.backends.backend_txt import backend_txt
+from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.loaders.frnn_dataset import shot_dataset
 
 
@@ -24,10 +22,14 @@ class test_frnn_dataset(unittest.TestCase):
         # Instantiate a file backend
         my_backend_file = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021/")
 
-        ds = shot_dataset(184800, MachineD3D(), [fs07, q95, neped], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
+        signal_fs07 = signal_0d("fs07")
+        #signal_q95 = signal_0d("q95")
+
+
+        ds = shot_dataset(184800, [signal_fs07], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
         print(ds.signal_tensor.shape)
-        for item in ds:
-            print(item.shape)
+        #for item in ds:
+        #    print(item.shape)
 
 
 if __name__ == "__main__":

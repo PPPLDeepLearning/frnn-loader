@@ -10,10 +10,8 @@ This package provides a pytorch DataSet interface to the FRNN data.
 It consists primarily of classes for 
 
 * Signals - 0d, 1d, and 2d measurements from fusion experiments
-* Shots - Collections of Signals from a shot at a machine
-* Machine - Abstractions of Devices such as DIII-D or NSTX
 * Storage - Storage backends that define layout of downloaded data on disk
-* Loading - Methods to remotely download data from fusion experiments
+* Fetchers - Methods to remotely download data from fusion experiments
 
 
 .. toctree::

@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 import time
 import numpy as np
+import torch
 import MDSplus as mds
 import yaml
 from frnn_loader.utils.errors import BadDownloadError, MDSNotFoundException
@@ -29,6 +30,9 @@ class fetcher_d3d_v1():
     Args:
         mds_hhostname (str): Hostname of the MDS server
 
+    Raises:
+        BadDownloadError
+
 
     """   
 
@@ -51,7 +55,8 @@ class fetcher_d3d_v1():
             ydata (ndarray)
 
         Raises:
-            BadDownloadError - If somehow all data is bad.
+            BadDownloadError - If the downloaded data contains less than 10 elements.
+            RuntimeWarning - If any downloaded data contains Inf or NaN
         
         """
         t0 = time.time()
@@ -100,6 +105,32 @@ class fetcher_d3d_v1():
                 continue
         if bad_size:
             raise BadDownloadError(f"Data that was downloaded from {self.mds_hostname} is empty")
+
+        if xdata is not None:
+            xdata = torch.tensor(xdata)
+            if torch.any(torch.isinf(xdata)).item():
+                raise RuntimeWarning("zdata contains inf values")
+
+            if torch.any(torch.isnan(xdata)).item():
+                raise RuntimeWarning("zdata contains NaN values")
+
+        if ydata is not None:
+            ydata = torch.tensor(ydata)
+            if torch.any(torch.isinf(ydata)).item():
+                raise RuntimeWarning("ydata contains inf values")
+
+            if torch.any(torch.isnan(ydata)).item():
+                raise RuntimeWarning("ydata contains NaN values")
+
+        if zdata is not None:
+            zdata = torch.tensor(zdata)
+            if torch.any(torch.isinf(zdata)).item():
+                raise RuntimeWarning("xdata contains inf values")
+
+            if torch.any(torch.isnan(zdata)).item():
+                raise RuntimeWarning("xdata contains NaN values")
+
+
 
         return xdata, ydata, zdata, xunits, yunits, zunits
 

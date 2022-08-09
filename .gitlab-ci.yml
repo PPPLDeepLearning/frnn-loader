@@ -16,6 +16,19 @@
 default:
   image: ubuntu:22.04
 
+# https://blog.lofibean.cc/posts/documentation-makes-easy-with-mkdocs-and-gitlab-pages/
+pages: 
+  stage: deploy
+  script:
+    - pip install sphinx
+    - cd ./docs
+    - sphinx-build -b html . public
+  artifacts:
+    paths:
+    - public
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
 stages:          # List of stages for jobs, and their order of execution
   - build
   - test
