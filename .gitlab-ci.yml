@@ -28,9 +28,10 @@ pages:
     - pwd
     - ls 
     - ls public
+    - mv pages ../..
   artifacts:
     paths:
-    - docs/source/public
+    - public
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
