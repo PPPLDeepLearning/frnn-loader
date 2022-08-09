@@ -8,7 +8,9 @@
 
 import os
 import sys
-sys.path.append("/home/rkube/repos/frnn_loader/frnn_loader")
+#sys.path.append("/home/rkube/repos/frnn-loader/frnn_loader")
+sys.path.insert(0, os.path.abspath("../../frnn_loader"))
+print(sys.path)
 
 project = 'frnn_loader'
 copyright = '2022, Ralph Kube'
