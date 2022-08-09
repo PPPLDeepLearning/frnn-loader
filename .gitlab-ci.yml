@@ -20,7 +20,7 @@ default:
 pages: 
   stage: deploy
   script:
-    - pip install sphinx
+    - pip3 install sphinx
     - cd ./docs
     - sphinx-build -b html . public
   artifacts:
