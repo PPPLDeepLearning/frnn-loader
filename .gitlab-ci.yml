@@ -28,7 +28,7 @@ pages:
     - pwd
     - ls 
     - ls public
-    - mv pages ../..
+    - mv public ../..
   artifacts:
     paths:
     - public
