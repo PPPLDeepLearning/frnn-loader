@@ -9,7 +9,8 @@
 import os
 import sys
 #sys.path.append("/home/rkube/repos/frnn-loader/frnn_loader")
-sys.path.insert(0, os.path.abspath("../../frnn_loader"))
+sys.path.append(os.path.abspath("../../frnn_loader"))
+sys.path.append(os.path.abspath("../.."))
 print(sys.path)
 
 project = 'frnn_loader'

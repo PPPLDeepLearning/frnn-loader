@@ -4,8 +4,6 @@ import numpy as np
 from scipy.interpolate import UnivariateSpline
 import logging
 
-
-from frnn_loader.primitives.signal import Signal
 from frnn_loader.utils.errors import SignalCorruptedError
 
 

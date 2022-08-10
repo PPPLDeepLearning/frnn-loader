@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 
+"""Defines access to downloaded signal data using txt files.
+
+    This backend loads downloaded data from txt files. 
+    Rows in the txt files correspond to time records.
+    The first column corresponds to the time of the record.
+    The following columns correspond to individual channels of the signal.
+
+    File paths for individual signals are constructed as
+    root/MMM/LocalPath/shotnr.txt.
+
+    Here
+    - root is the root member of the class
+    - MMM is the machine specified for a signal
+    - LocalPath is the LocalPath specified in the signal in `d3d_signals.yaml`
+    - shotnr is the Shot number.
+"""
 from os.path import join, getsize, isfile
 import logging
 import torch
@@ -8,9 +24,8 @@ from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
 class backend_txt:
-    """Backend to xtore/load from txt files.
+    """Backend to store/load from txt files.
 
-    This backend loads downloaded data from txt files.
 
     Args:
         root (string) : Root path of the data directory
@@ -24,15 +39,15 @@ class backend_txt:
     def load(self, sig_info, shotnr):
         """Loads a specified signal for a given shot on a machine.
 
-        Args:
+        Args
             sig_info (Dict) : Dictionary generated from signal yaml file
             shotnr (int) : Shot number
 
-        Returns:
+        Returns
             timebase (torch.tensor) : Timebase of the signal
             signal (torch.tensor) : Signal samples
 
-        Raises:
+        Raises
             ValueError: When selected signal is unavailable on the machine
             NotDownloadedError : The signal has not been downloaded
             SignalCorruptedError : The file size is zero

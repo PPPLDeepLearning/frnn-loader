@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 """Definitions of machine backends.
 
-This module contains the machine class and derived classes.
-These classes define methods for downloading the respective signals.
+This module is deprecated and is not used.
 
-Derived classes include D3D, JET, and NSTX.
 """
 
 import numpy as np

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Helper functions for machine classes.
 
-Various helper functions that modify strings for paths etc.
+This module is deprecated and no longer used.
 """
 
 import numpy as np

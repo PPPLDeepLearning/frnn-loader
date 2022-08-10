@@ -17,7 +17,7 @@ The major components of the package are three classes:
 * Backends - Storage backends that define layout of downloaded data on disk
 * Fetchers - Methods to remotely download data from fusion experiments
 
-
+Here is text :)
 
 .. toctree::
    :maxdepth: 2
@@ -25,8 +25,7 @@ The major components of the package are three classes:
 
    examples
    deployment
-   loaders
-   backends
+   modules
 
 
 

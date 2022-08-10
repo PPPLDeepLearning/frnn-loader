@@ -1,4 +1,14 @@
 # -*- coding: UTF-8 -*-
+
+"""Defines access to signal data using remote data server.
+
+Data signals authorities are the respective experiments MDS servers.
+This module deefines classes that allows to fetch signals from these servers.
+
+Signals, together with metadata are defined in frnn_loader/data/d3d_signals.yaml.
+In particular, the signal_info dict is constructed using this metadata.
+"""
+
 import time
 import numpy as np
 import torch
@@ -6,15 +16,12 @@ import MDSplus as mds
 import yaml
 from frnn_loader.utils.errors import BadDownloadError, MDSNotFoundException
 
-def mds_get_units(string, c):
-    """Returns units of an MDS expression"""
-    units = c.get(f'units_of({string})').data()
-    if units == '' or units == ' ':
-        units = c.get(f'units({string})').data()
-    return units
-
 class fetcher():
+    """Abstract basis class for fetchers."""
     def __init__(self):
+        pass
+
+    def fetch(self, signal_info, shotnr):
         pass
 
 class fetcher_d3d_v1():

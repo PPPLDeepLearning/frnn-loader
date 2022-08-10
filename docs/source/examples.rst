@@ -2,7 +2,7 @@
 Example
 =======
 
-Create a Dataset consisting of signal `fs07` for D3D discharge 184800:
+Create a Dataset consisting of signal `fs07` for D3D discharge 184800.
 
 .. code-block:: 
     
@@ -18,11 +18,14 @@ Create a Dataset consisting of signal `fs07` for D3D discharge 184800:
         signal_fs07 = signal_0d("fs07")
 
         # Instantiate a dataset
-        ds = shot_dataset(184800, [signal_fs07], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
+        ds = shot_dataset(184800, [signal_fs07], resampler=my_resampler, backend_file=my_backend_file, 
+                          download=False, dtype=torch.float32)
 
         # We can now iterate over the datasets samples:
         for item in ds:
-            print(item.shape)
+            # Do things
+
+This example assumes that all signal data is available in "/home/rkube/datasets/frnn/signal_data_new_2021".
+Data loading from disk is handled using a :class:`frnn_loader.backends.backend_txt` object.
 
 
-done 

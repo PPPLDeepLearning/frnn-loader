@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 
+"""FRNN Dataset
+
+This is a doc string for the class.
+
+"""
+
+
 import torch
 from torch.utils.data import Dataset
 import logging
