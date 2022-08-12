@@ -1,3 +1,6 @@
+![pipeline-status](https://gitlab.com/gitlab-org/gitlab/badges/main/pipeline.svg)
+![coverage](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=coverage)
+
 # frnn-loader
 
 Code in this repository makes big fusion data available as [pytorch](https://pytorch.org/) style
