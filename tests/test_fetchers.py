@@ -15,7 +15,7 @@ import torch
 
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
-from frnn_loader.utils.errors import BadDownloadError, MDSNotFoundException
+from frnn_loader.utils.errors import BadDownloadError
 
 
 class test_fetch_d3d(unittest.TestCase):

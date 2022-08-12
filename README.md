@@ -6,42 +6,39 @@ tasks.
 
 ## Usage
 
-To define a Dataset for one D3D discharge using a filterscope, q95, and pedestal electron density,
-a dataset can be instantiated like this:
+To define a Dataset for one D3D discharge using filterscope, q95, and pedestal electron density signals, a dataset can be instantiated like this:
 
 ```python
 import torch
-from frnn_loader.backends.machine import MachineD3D
-from frnn_loader.data.user_signals import fs07, ip, q95, neped
 
 from frnn_loader.primitives.resamplers import resampler_last
 from frnn_loader.backends.backend_txt import backend_txt
+from frnn_loader.backends.fetchers import fetcher_d3d_v1
+from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.loaders.frnn_dataset import shot_dataset
 
-# Instantiate a resampler
 my_resampler = resampler_last(0.0, 2.0, 1e-3)
 
 # Instantiate a file backend
 my_backend_file = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021/")
+my_fetcher = fetcher_d3d_v1()
 
-ds_d3d = shot_dataset(184800, MachineD3D(), [fs07, q95, neped], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
-```
+signal_fs07 = signal_0d("fs07")
+signal_q95 = signal_0d("q95")
 
-The same dataset can be defined for JET by changing
-```
-ds_jet = shot_dataset(184800, MachineJET(), [fs07, q95, neped], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
-```
 
-And for NSTX:
-```
-ds_nstx = shot_dataset(184800, MachineNSTX(), [fs07, q95, neped], resampler=my_resampler, backend_file=my_backend_file, download=False, dtype=torch.float32)
+ds = shot_dataset(184800, [signal_fs07, signal_q95], 
+                    resampler=my_resampler, backend_file=my_backend_file, 
+                    backend_fetcher=my_fetcher, download=True,
+                    dtype=torch.float32)
+
+for item in ds:
+    pass
 ```
 
 Here `frnn_loader` handles details of 
 * resampling the signals onto a common time-base
-* Caching the data from respective MDS servers into local file
-automatically in the backgroun.
-
+* Caching the data from respective MDS servers into local file automatically in the backgroun.
 
 ## Installation
 To install the `frnn_loaders` package in your conda environment do

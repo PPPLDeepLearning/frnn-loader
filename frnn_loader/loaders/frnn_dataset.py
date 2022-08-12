@@ -144,8 +144,7 @@ class shot_dataset(Dataset):
         for signal in self.predictors:
             # Try loading the signal. When this fails, append dummy data.
             try:
-                tb, signal_data = self.backend_file.load(signal.info, self.shotnr
-                )
+                tb, signal_data = self.backend_file.load(signal.info, self.shotnr)
 
             except SignalCorruptedError as err:
                 # TODO: Why is there a sig[1] in the dimension
@@ -158,6 +157,7 @@ class shot_dataset(Dataset):
             except NotDownloadedError as err:
                 logging.error(f"Signal not downloaded: {err}")
                 if self.download:
+                    logging.info(f"Downloading signal {signal}")
                     # TODO: Download signal
                     None
                 else:

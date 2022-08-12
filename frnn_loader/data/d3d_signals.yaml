@@ -60,6 +60,12 @@ lm:
   PTData: dusbradial
   LocalPath: dusbradial
 
+echpwrc:
+  Machine: D3D
+  Description: Total EC power injected into DIII-D
+  MDSTree: D3D
+  MDSPATH: RF.ECH.TOTAL:ECHPWRC
+
 pradcore:
   Machine: D3D
   Description: Radiated Power Core
