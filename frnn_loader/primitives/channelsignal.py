@@ -3,7 +3,8 @@
 import re
 import numpy as np
 from os.path import join
-#from frnn_loader.primitives.signal import Signal
+
+# from frnn_loader.primitives.signal import Signal
 # from frnn_loader.utils.processing import get_individual_shot_file
 from frnn_loader.utils.errors import DataFormatError
 

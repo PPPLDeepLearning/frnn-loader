@@ -26,19 +26,18 @@ class signal_base:
 
         tag (str): Key name for dictionarie defined in user_signal.yaml
         sig_def_fname (str): Path to definitions of user signals
-    
+
     """
 
     def __init__(
         self,
         tag,
-        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml"
+        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml",
     ):
         self.tag = tag
         with open(sig_def_fname, "r") as df:
             signal_defs = yaml.load(df, Loader=yaml.FullLoader)
         self.info = signal_defs[tag]
-
 
     def load_data(self, shotnr, backend):
         """Load data using the backend.
@@ -65,16 +64,16 @@ class signal_base:
 
     def fetch_data(self, shotnr, fetcher):
         """Fetch data using a data_fetcher.
-        
+
         Args:
             shotnr (int): Shot number
             fetcher (fetcher): Datafetcher to use
 
         Returns:
             timebase (torch.tensor): Time base for the signal. dim0: sample (time)
-            signal (torch.tensor): Sampels signal. 
+            signal (torch.tensor): Sampels signal.
         """
-        return(fetcher.fetch(self.info, shotnr))
+        return fetcher.fetch(self.info, shotnr)
 
     def __eq__(self, other):
         if other is None:
@@ -112,12 +111,9 @@ class signal_0d(signal_base):
     def __init__(
         self,
         tag,
-        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml"
+        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml",
     ):
-        super().__init__(
-            tag,
-            sig_def_fname
-        )
+        super().__init__(tag, sig_def_fname)
         self.num_channels = 1
         # I'm skipping several parameters from the original definition here.
 

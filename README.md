@@ -7,6 +7,8 @@ Code in this repository makes big fusion data available as [pytorch](https://pyt
 [Datasets](https://pytorch.org/tutorials/beginner/basics/data_tutorial.html), targeting deep-learning
 tasks.
 
+[Documentation](https://rkube.git.pppl.gov/frnn-loader/index.html)
+
 ## Usage
 
 To define a Dataset for one D3D discharge using filterscope, q95, and pedestal electron density signals, a dataset can be instantiated like this:

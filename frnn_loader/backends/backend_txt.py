@@ -55,7 +55,9 @@ class backend_txt:
         # Construct the path where a signal is stored for the specified machine
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
-        file_path = join(self.root, sig_info["Machine"], sig_info["LocalPath"], f"{shotnr}.txt")
+        file_path = join(
+            self.root, sig_info["Machine"], sig_info["LocalPath"], f"{shotnr}.txt"
+        )
 
         # Perform checks to see that the file is good.
         if not isfile(file_path):
@@ -78,7 +80,6 @@ class backend_txt:
         # First column is the timebase
         # After second column is the signal data
         return data[:, 0], data[:, 1:]
-
 
     def store(self, sig_info, shot, data):
         pass

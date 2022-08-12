@@ -16,15 +16,18 @@ import MDSplus as mds
 import yaml
 from frnn_loader.utils.errors import BadDownloadError, MDSNotFoundException
 
-class fetcher():
+
+class fetcher:
     """Abstract basis class for fetchers."""
+
     def __init__(self):
         pass
 
     def fetch(self, signal_info, shotnr):
         pass
 
-class fetcher_d3d_v1():
+
+class fetcher_d3d_v1:
     """Fetch data from D3D using MDSplus.
 
 
@@ -41,17 +44,16 @@ class fetcher_d3d_v1():
         BadDownloadError
 
 
-    """   
+    """
 
     def __init__(self, mds_hostname="atlas.gat.com"):
         # Connect to D3D MDplus server
         self.mds_hostname = mds_hostname
         self.conn = mds.Connection(mds_hostname)
 
-
     def fetch(self, signal_info, shotnr):
         """Fetch data from D3D MDS server
-        
+
         Args:
             signal_info (dict): Info dictionary from shot class
             shotnr (int): Shot number
@@ -64,7 +66,7 @@ class fetcher_d3d_v1():
         Raises:
             BadDownloadError - If the downloaded data contains less than 10 elements.
             RuntimeWarning - If any downloaded data contains Inf or NaN
-        
+
         """
         t0 = time.time()
         # The signal.info dictionary tells us how to load the data from MDS.
@@ -93,12 +95,12 @@ class fetcher_d3d_v1():
             if xdata.ndim == 2:
                 xdata = xdata.T
 
-        # If we have a PTdata in the keys, assume we need to fetch the data using the ptdata2 call:        
+        # If we have a PTdata in the keys, assume we need to fetch the data using the ptdata2 call:
         elif "PTData" in signal_info.keys():
             s = signal_info["PTData"]
             zdata = self.conn.get(f'_s = ptdata2("{s}", {shotnr})').data()[:]
             if len(zdata) != 1:
-                xdata = self.conn.get('dim_of(_s)').data()[:]
+                xdata = self.conn.get("dim_of(_s)").data()[:]
 
         # Hack: If we can get a size, assume a return element i a numpy array.
         # IF any of them is has positive size think that we got good data back.
@@ -111,7 +113,9 @@ class fetcher_d3d_v1():
             except:
                 continue
         if bad_size:
-            raise BadDownloadError(f"Data that was downloaded from {self.mds_hostname} is empty")
+            raise BadDownloadError(
+                f"Data that was downloaded from {self.mds_hostname} is empty"
+            )
 
         if xdata is not None:
             xdata = torch.tensor(xdata)
@@ -137,8 +141,7 @@ class fetcher_d3d_v1():
             if torch.any(torch.isnan(zdata)).item():
                 raise RuntimeWarning("xdata contains NaN values")
 
-
-
         return xdata, ydata, zdata, xunits, yunits, zunits
+
 
 # end of file fetchers.py

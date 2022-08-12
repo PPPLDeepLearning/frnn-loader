@@ -11,7 +11,8 @@ import logging
 from frnn_loader.utils.errors import SignalNotFoundError
 from frnn_loader.backends.machine_helper import (
     create_missing_value_filler,
-    get_tree_and_tag)
+    get_tree_and_tag,
+)
 
 
 class Machine:
