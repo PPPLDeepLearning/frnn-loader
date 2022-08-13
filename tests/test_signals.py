@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
+# run with
+# python -m unittest tests/test_frnndataset.py
 import unittest
+import logging
+import tempfile
+from os import makedirs
 
 from frnn_loader.backends.backend_txt import backend_txt
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.utils.errors import NotDownloadedError
 
-#from frnn_loader.data.user_signals import d3d_signals_0D
-
+FORMAT = "%(asctime)s unittest test_frnndataset %(message)s"
+logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 
 class TestSignals(unittest.TestCase):
     """Test routines for machines."""
@@ -21,37 +26,32 @@ class TestSignals(unittest.TestCase):
         fs07.load_data(184800, my_backend)
 
     def test_signals_0d(self):
-        # Bad: pradedge
+        """Compare downloaded signal shape to data read from backend."""
+        shotnr = 180619
         sig_names = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
                      "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
                      "iptdirect", "iptarget",
-                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2",
-                     "etemp_profile"]
-        my_backend = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021")
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
+
+        # The working dir should be empty. Test will fail if not empty.
+        wd = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+
+        my_backend = backend_txt(wd)
         my_fetcher = fetcher_d3d_v1()
 
         for name in sig_names:
-            print(f"========================= {name} =================================")
+            logging.info(f"========================= {name} =================================")
             signal = signal_0d(name)
-            bad_size = True
-            try:
-                signal.load_data(186019, my_backend)
-            except NotDownloadedError as err:
-                dl = signal.fetch_data(186019, my_fetcher)
-                print(f"Downloaded time series with {dl[2].size} elements")
-                print(f"Max: {dl[2].max()}, min: {dl[2].min()}, mean: {dl[2].mean()}, std: {dl[2].std()}")
+            # Download the signal
+            xdata, _, zdata, _, _, _ = my_fetcher.fetch(signal.info, shotnr)
+            # Write it to file using the backend.
+            my_backend.store(signal.info, shotnr, xdata, zdata)
 
+            # Now read it again using the same backend.
+            tb, sig_data = my_backend.load(signal.info, shotnr)
 
-
-
-    # def test_signals_0d_d3d(self):
-    #     """Test whether we can instantiate all 0d signals D3D signals."""
-    #     for key, signal in d3d_signals_0D.items():
-    #         print(f"Testing signal {signal}", type(signal))
-
-    # def test_signals_1d_d3d(self):
-    #     """Test whether we can instantiate all 1D signals at D3D."""
-    #     pass
+            assert((tb - xdata).mean() < 1e-8)
+            assert((sig_data - zdata).mean() < 1e-8)
 
 
 if __name__ == "__main__":

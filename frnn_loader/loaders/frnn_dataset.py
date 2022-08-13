@@ -111,7 +111,6 @@ class shot_dataset(Dataset):
             # Interpolate on new time-base
             tb_rs, sig_rs = self.resampler(tb, sig)
 
-            
             # Populate signals_tensor with the re-sampled signals
             self.signal_tensor[
                 :, curr_channel : curr_channel + signal.num_channels
@@ -164,8 +163,12 @@ class shot_dataset(Dataset):
                     logging.info(f"Downloading signal {signal}")
                     # TODO: Download signal
                     if type(signal) == signal_0d:
-                        tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(signal.info, self.shotnr)
-                        self.backend_file.store(signal.info, self.shotnr, tb, signal_data)
+                        tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(
+                            signal.info, self.shotnr
+                        )
+                        self.backend_file.store(
+                            signal.info, self.shotnr, tb, signal_data
+                        )
 
                 else:
                     raise err

@@ -62,7 +62,7 @@ class fetcher_d3d_v1:
         Returns:
             xdata (torch.tensor) - Time base of the requested data
             ydata (torch.tensor) - Optional ydata returned by MDS
-            zdata (torch.tensor) - MDS signal as a 2-dimensional tensor. dim0: Sample. dim1: Channels. 
+            zdata (torch.tensor) - MDS signal as a 2-dimensional tensor. dim0: Sample. dim1: Channels.
             xunits (string) - (Optional) units of the time base. Can be empty.
             yunits (string) - (Optional) units of the ydata. Can be empty.
             zunits (string) - (Optional) units of the signal. Can be empty.
@@ -146,13 +146,13 @@ class fetcher_d3d_v1:
             if torch.any(torch.isnan(zdata)).item():
                 raise RuntimeWarning("xdata contains NaN values")
 
-            if signal_info['ndim'] == 0:
+            if signal_info["ndim"] == 0:
                 zdata = zdata.unsqueeze(1)
-                #logging.debug(f"Downloaded 0d signal: {signal_info}. zdata.shape = {zdata.shape}")
+                # logging.debug(f"Downloaded 0d signal: {signal_info}. zdata.shape = {zdata.shape}")
 
         # Final asserts on the shape of the array.
         # zdata shold be two-dimensional. Dim0: Sample. Dim1: Channel (this is [nsample, 1] for 0d data.)
-        assert(zdata.ndim == 2)
+        assert zdata.ndim == 2
 
         return xdata, ydata, zdata, xunits, yunits, zunits
 
