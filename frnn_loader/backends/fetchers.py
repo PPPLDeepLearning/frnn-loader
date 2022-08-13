@@ -9,11 +9,8 @@ Signals, together with metadata are defined in frnn_loader/data/d3d_signals.yaml
 In particular, the signal_info dict is constructed using this metadata.
 """
 
-import time
-import numpy as np
 import torch
 import MDSplus as mds
-import yaml
 import logging
 from frnn_loader.utils.errors import BadDownloadError, MDSNotFoundException
 
@@ -73,7 +70,6 @@ class fetcher_d3d_v1:
             RuntimeWarning - If any downloaded data contains Inf or NaN
 
         """
-        t0 = time.time()
         # The signal.info dictionary tells us how to load the data from MDS.
         xdata, ydata, zdata = None, None, None
         xunits, yunits, zunits = None, None, None

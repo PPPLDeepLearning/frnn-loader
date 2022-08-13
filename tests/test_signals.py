@@ -40,7 +40,6 @@ class TestSignals(unittest.TestCase):
         my_fetcher = fetcher_d3d_v1()
 
         for name in sig_names:
-            logging.info(f"========================= {name} =================================")
             signal = signal_0d(name)
             # Download the signal
             xdata, _, zdata, _, _, _ = my_fetcher.fetch(signal.info, shotnr)

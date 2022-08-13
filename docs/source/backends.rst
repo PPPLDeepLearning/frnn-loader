@@ -4,6 +4,14 @@ backends package
 Submodules
 ----------
 
+backends.backend module
+-----------------------
+
+.. automodule:: backends.backend
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 backends.backend\_txt module
 ----------------------------
 
@@ -16,22 +24,6 @@ backends.fetchers module
 ------------------------
 
 .. automodule:: backends.fetchers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-backends.machine module
------------------------
-
-.. automodule:: backends.machine
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-backends.machine\_helper module
--------------------------------
-
-.. automodule:: backends.machine_helper
    :members:
    :undoc-members:
    :show-inheritance:

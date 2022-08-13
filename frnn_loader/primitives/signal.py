@@ -5,17 +5,8 @@ Class representations of measurement signals.
 
 """
 
-from os import remove
-from os.path import isfile, join, getsize
-
 import logging
-
-import numpy as np
 import yaml
-
-from frnn_loader.utils.processing import get_individual_shot_file
-from frnn_loader.utils.downloading import get_missing_value_array
-from frnn_loader.utils.hashing import myhash
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
