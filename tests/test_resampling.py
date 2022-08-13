@@ -19,7 +19,7 @@ class test_resampler_last(unittest.TestCase):
         sig_old = sig_old.unsqueeze(1)
 
         # Resampler on new time interval
-        my_resampler = resampler_last(0.0, 1.0, 2e-2)
+        my_resampler = resampler_last(0.0, 1.0, 1e-2)
         tb_new, sig_new = my_resampler(tb_old, sig_old)
 
         # Get the over-lapping part of the time bases

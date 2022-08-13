@@ -3,6 +3,7 @@
 from os.path import join
 import torch
 
+
 class backend:
     """Abstract basis class for all backends.
 
@@ -34,7 +35,7 @@ class backend:
         Returns:
             string: File path to the data file.
         """
-        return join( self.root, sig_info["Machine"], sig_info["LocalPath"])
+        return join(self.root, sig_info["Machine"], sig_info["LocalPath"])
 
 
 # end of file backend.txt

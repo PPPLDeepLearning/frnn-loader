@@ -24,6 +24,7 @@ import torch
 from frnn_loader.backends.backend import backend
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
+
 class backend_txt(backend):
     """Backend to store/load from txt files.
 
@@ -55,7 +56,9 @@ class backend_txt(backend):
         # Construct the path where a signal is stored for the specified machine
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
-        file_path = path.join(self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt")
+        file_path = path.join(
+            self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt"
+        )
 
         # Perform checks to see that the file is good.
         if not path.isfile(file_path):
@@ -93,13 +96,14 @@ class backend_txt(backend):
         """
         # Concatenate time-base and signal sample tensor
         all_vals = torch.cat([tb.unsqueeze(1), signal], 1)
-        file_path = path.join(self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt")
+        file_path = path.join(
+            self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt"
+        )
 
         # If the directory does not exist yet create it
         if not path.isdir(path.dirname(file_path)):
             makedirs(path.dirname(file_path))
             logging.info(f"backend_txt: creating {path.dirname(file_path)}")
-
 
         with open(file_path, "w") as fp:
             for row in range(all_vals.shape[0]):
