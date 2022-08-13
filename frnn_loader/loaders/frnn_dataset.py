@@ -11,6 +11,7 @@ import torch
 from torch.utils.data import Dataset
 import logging
 
+from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.utils.errors import (
     NotDownloadedError,
     SignalCorruptedError,
@@ -88,26 +89,29 @@ class shot_dataset(Dataset):
         Returns:
             None
         """
-        logging.info("Preprocessing shot {self.shotnr}")
+        logging.info(f"Preprocessing shot {self.shotnr}")
         time_arrays, signal_arrays, t_min, t_max = self._load_signal_data()
-        # res = self._load_signal_data()
-        # resample signals on a common time-base
+
         assert len(signal_arrays) > 0
         assert len(signal_arrays) == len(time_arrays)
         assert len(signal_arrays) == len(self.predictors)
 
-        # Re-sample each signal individually
+        # Re-sample each signal
         # Store the re-sampled signal in a tensor
-        logging.info(f"Resmapling shot {self.shotnr}")
         # Keep track of how many channels a signal has used
         curr_channel = 0
         for (i, signal) in enumerate(self.predictors):
+            logging.debug(f"Resampling signal {signal}")
             # Cut the signal to [t_min:t_max]
             good_idx = (time_arrays[i] >= t_min) & (time_arrays[i] <= t_max)
             tb = time_arrays[i][good_idx]
+            # We can generally address signals as [sample_idx, channel_idx], since even
+            # 0d signals are 2d tensors.
             sig = signal_arrays[i][good_idx, :]
             # Interpolate on new time-base
             tb_rs, sig_rs = self.resampler(tb, sig)
+
+            
             # Populate signals_tensor with the re-sampled signals
             self.signal_tensor[
                 :, curr_channel : curr_channel + signal.num_channels
@@ -149,17 +153,20 @@ class shot_dataset(Dataset):
             except SignalCorruptedError as err:
                 # TODO: Why is there a sig[1] in the dimension
                 # signal = np.zeros((tb.shape[0], sig[1]))
-                logging.error(f"Erorr occured: {err}")
+                logging.error(f"SignalCorrupted occured: {err}")
                 invalid_signals += 1
                 signal_arrays.append(torch.zeros([tb.shape[0], 1]), dtype=self.dtype)
-                tb_arrays.append(torch.arange(0, 20, 1e-3, dtype=self.dtype))
+                tb_arrays.append(torch.arange(0.0, 1e3, 1e0, dtype=self.dtype))
 
             except NotDownloadedError as err:
                 logging.error(f"Signal not downloaded: {err}")
                 if self.download:
                     logging.info(f"Downloading signal {signal}")
                     # TODO: Download signal
-                    None
+                    if type(signal) == signal_0d:
+                        tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(signal.info, self.shotnr)
+                        self.backend_file.store(signal.info, self.shotnr, tb, signal_data)
+
                 else:
                     raise err
 
@@ -169,7 +176,7 @@ class shot_dataset(Dataset):
                 + ", signal.shape = "
                 + str(signal_data.shape)
             )
-            print(log_msg)
+            logging.info(log_msg)
 
             # At this point, assume that the loaded data is good.
             # Update t_min and append signal and timebase to the working data
@@ -202,7 +209,7 @@ class shot_dataset(Dataset):
         # 1/ t_max should be larger than t_min
         if t_max < t_min:
             raise BadShotException(
-                f"Shot {self.number} has t_max = {t_max} < t_min = {t_min}. Expected t_max > t_min."
+                f"Shot {self.shotnr} has t_max = {t_max} < t_min = {t_min}. Expected t_max > t_min."
             )
         # TODO: Move this test so we don't have to pass conf
         #        # 2/ The shot timebase should be sufficiently long enough.

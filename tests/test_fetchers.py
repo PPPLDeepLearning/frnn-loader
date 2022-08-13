@@ -10,12 +10,15 @@ The unit tests here test
 """
 
 import unittest
-
 import torch
+import logging
 
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
 from frnn_loader.utils.errors import BadDownloadError
+
+FORMAT = "%(asctime)s unittest test_fetchers %(message)s"
+logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 
 
 class test_fetch_d3d(unittest.TestCase):
@@ -34,7 +37,7 @@ class test_fetch_d3d(unittest.TestCase):
                 print(f"{err}")
                 continue
             
-            print(f"""Got signal {signal}. zdata.shape = {zdata.shape} zunits = {zunits}""") 
+            logging.info(f"""Got signal {signal}. zdata.shape = {zdata.shape} zunits = {zunits}""") 
 
             #print(f"Got signal {signal}. tb.shape = ", tb.shape, ", data.shape = ", data.shape)
 

@@ -31,7 +31,10 @@ class test_backend_txt(unittest.TestCase):
 
             # Let's see if any data is inf or nan
             assert(torch.any(torch.isinf(data)).item() is False)
-            assert(torch.any(torch.isnan(data))).item() is False)
+            assert(torch.any(torch.isnan(data)).item() is False)
+
+
+
 
 
 if __name__ == "__main__":

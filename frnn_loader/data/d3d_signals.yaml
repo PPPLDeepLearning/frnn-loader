@@ -1,6 +1,17 @@
 
 ---
 # A list of D3D signals
+#
+#
+# Properties of signals are as follows:
+# Machine: Name of the machine where this signal is defined on.
+# Description: Detailed description
+# PTData: Point name for PTdata system. It's either setting this one or the MDS info below
+# MDSTree: Name of the MDS tree where the signal is defined on.
+# MDSPath: Path inside the MDSTree to fetch the signal from
+# LocalPath: USed to create local sub-folder or HDF datasets
+# ndim: number of dimensions. 0d - scalar time series. 1d - profile time series. 2d - think ECEI
+# Channels: number of channels. 1 for 0d data. number for profiles.
 
 
 dens:
@@ -8,6 +19,8 @@ dens:
   Description: Plasma Density
   PTData: dssdenest
   LocalPath: dssdenest
+  ndim: 0
+  Channels: 1
 
 fs07:
   Machine: D3D
@@ -15,6 +28,8 @@ fs07:
   MDSTree: D3D
   MDSPath: SPECTROSCOPY.FILTERSCOPE.PMT15:PHOTON_FLUX
   LocalPath: fs07
+  ndim: 0
+  Channels: 1
 
 q95:
   Machine: D3D
@@ -22,6 +37,8 @@ q95:
   MDSTree: EFIT01
   MDSPath: RESULTS.AEQDSK:Q95
   LocalPath: q95
+  ndim: 0
+  Channels: 1
 
 qmin:
   Machine: D3D
@@ -29,42 +46,56 @@ qmin:
   MDSTree: EFITRT1
   MDSPath: RESULTS.AEQDSK.QMIN
   LocalPath: qmin
+  ndim: 0
+  Channels: 1
 
 li:
   Machine: D3D
   Description: Internal inductance
   PTData: efsli
   LocalPath: efsli
+  ndim: 0
+  Channels: 1
 
 ip:
   Machine: D3D
   Description: Plasma Current
   PTData: ipspr15V
   LocalPath: ipspr15V
+  ndim: 0
+  Channels: 1
 
 betan:
   Machine: D3D
   Description: Normalized beta
   PTData: efsbetan
   LocalPath: efsbetan
+  ndim: 0
+  Channels: 1
 
 energy:
   Machine: D3D
   Description: Stored Energy
   PTData: efswmhd
   LocalPath: efswmhd
+  ndim: 0
+  Channels: 1
 
 lm:
   Machine: D3D
   Description: Locked Mode Amplitude
   PTData: dusbradial
   LocalPath: dusbradial
+  ndim: 0
+  Channels: 1
 
 echpwrc:
   Machine: D3D
   Description: Total EC power injected into DIII-D
   MDSTree: D3D
   MDSPATH: RF.ECH.TOTAL:ECHPWRC
+  ndim: 0
+  Channels: 1
 
 pradcore:
   Machine: D3D
@@ -72,6 +103,8 @@ pradcore:
   MDSTree: D3D
   MDSPath: SPECTROSCOPY.PRAD.BOLOM.PRAD_01.POWER:BOL_L15_P
   LocalPath: bol_l15_p
+  ndim: 0
+  Channels: 1
 
 pradedge:
   Machine: D3D
@@ -79,54 +112,72 @@ pradedge:
   MDSTree: D3D
   MDSPath: SPECTROSCOPY.PRAD.BOLOM.PRAD_01.POWER:BOL_L03_P
   LocalPath: bol_l03_p
+  ndim: 0
+  Channels: 1
 
 bmspinj:
   Machine: D3D
   Description: Beam input power
   PTData: bmspinj
   LocalPath: bmspinj
+  ndim: 0
+  Channels: 1
 
 bmstinj:
   Machine: D3D
   Description: Beam input torque
   PTData: bmstinj
   LocalPath: bmstinj
+  ndim: 0
+  Channels: 1
 
 iptdirect:
   Machine: D3D
   Description: Plasma current direction
   PTData: iptdirect
   LocalPath: iptdirect
+  ndim: 0
+  Channels: 1
 
 iptarget:
   Machine: D3D
   Description: Plasma current target
   PTData: ipsiptargt
   LocalPath: ipsiptargt
+  ndim: 0
+  Channels: 1
 
 tmamp1:
   Machine: D3D
   Description: Tearing Mode amplitude, rotating 2/1
   PTData: nssampn1l
   LocalPath: nssampn1l
+  ndim: 0
+  Channels: 1
 
 tmamp2:
   Machine: D3D
   Description: Tearing Mode amplitude, rotating 3/2
   PTData: nssampn2l
   LocalPath: nssampn2l
+  ndim: 0
+  Channels: 1
 
 tmfreq1:
   Machine: D3D
   Description: Tearing Mode frequency, rotating 2/1
   PTData: nssfrqn1l
   LocalPath: nssfrqn1l
+  ndim: 0
+  Channels: 1
 
 tmfreq2:
   Machine: D3D
   Description: Tearing Mode frequency, rotating 3/2
   PTData: nssfrqn1l
   LocalPath: nssfrqn1l
+  ndim: 0
+  Channels: 1
 
 etemp_profile:
   Machine: D3D
@@ -134,6 +185,8 @@ etemp_profile:
   MDSTree: ZIPFIT01
   MDSPath: PROFILES:ETEMPFIT
   LocalPath: etemp_profile
+  ndim: 1
+  Channels: 1
 
 edens_profile:
   Machine: D3D
@@ -141,6 +194,8 @@ edens_profile:
   MDSTree: ZIPFIT01
   MDSPath: PROFILES:EDENSFIT
   LocalPath: edens_profile
+  ndim: 1
+  Channels: 1
 
 
 

@@ -23,6 +23,8 @@ import torch
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
 
 
+
+
 class backend_txt:
     """Backend to store/load from txt files.
 
@@ -35,6 +37,27 @@ class backend_txt:
     def __init__(self, root, dtype=torch.float32):
         self.root = root
         self.dtype = dtype
+
+    def _construct_file_path(self, sig_info, shotnr):
+        """Constructs a path to load/store the file from.
+        
+        >>> from frnn_loader.primitives import signal_0d
+        >>> from frnn_loader.backends.backend_txt import backend_txt
+        >>> signal_fs07 = signal_0d("fs07")
+        >>> my_backend = backend_txt("/home/rkube/datasets/frnn/dataset01")
+        >>> my_backend._construct_file_path(signa_fs07.info, 180400)
+            /home/rkube/datasets/frnn/dataset01/d3d/fs07/180400.txt
+
+        This routine uses dictionary keys
+
+        Args:
+            sig_info (dict): Dictionary describing a user signal
+            shotnr (int): Shot number
+
+        Returns:
+            string: File path to the data file.
+        """
+        return join(self.root, sig_info["Machine"], sig_info["LocalPath"], f"{shotnr}.txt")
 
     def load(self, sig_info, shotnr):
         """Loads a specified signal for a given shot on a machine.
@@ -55,9 +78,7 @@ class backend_txt:
         # Construct the path where a signal is stored for the specified machine
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
-        file_path = join(
-            self.root, sig_info["Machine"], sig_info["LocalPath"], f"{shotnr}.txt"
-        )
+        file_path = self._construct_file_path(sig_info, shotnr)
 
         # Perform checks to see that the file is good.
         if not isfile(file_path):
@@ -67,7 +88,7 @@ class backend_txt:
 
         if getsize(file_path) == 0:
             raise SignalCorruptedError(
-                f"Signal {sig_info['description']}, shot {shotnr} has size==0. Removing."
+                f"Signal {sig_info['Description']}, shot {shotnr} has size==0. Removing."
             )
 
         # Load manually into a list and convert to torch.tensor
@@ -81,8 +102,33 @@ class backend_txt:
         # After second column is the signal data
         return data[:, 0], data[:, 1:]
 
-    def store(self, sig_info, shot, data):
-        pass
+    def store(self, sig_info, shotnr, tb, signal):
+        """Store a signal.
+        
+        Args:
+            sign_info (dict) : Dictionary generated from signal yaml file
+            shotnr (int): Shot number
+            tb (torch.tensor): Timebase of the signal
+            signal (torch.tensor): Signal samples
+        
+        Returns:
+            None
+        """
+        # Concatenate time-base and signal sample tensor
+        all_vals = torch.cat([tb.unsqueeze(1), signal], 1)
+
+        file_path = self._construct_file_path(sig_info, shotnr)
+
+        with open(file_path, "w") as fp:
+            for row in range(all_vals.shape[0]):
+                # Write first number as floating point, the others in
+                # scientific notation
+                line = f"{all_vals[row, 0]:08f} "
+                line += " ".join([f"{val:10.8e}" for val in all_vals[row, 1:]])
+                line += "\n"
+                fp.write(line)
+
+
 
 
 # end of file backend_txt.py

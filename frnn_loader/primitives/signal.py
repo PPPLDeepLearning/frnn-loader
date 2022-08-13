@@ -24,7 +24,7 @@ class signal_base:
 
     Args:
 
-        tag (str): Key name for dictionarie defined in user_signal.yaml
+        tag (str): Key name for the signal. This will be matched with to a key defined in user_signal.yaml
         sig_def_fname (str): Path to definitions of user signals
 
     """
@@ -102,9 +102,8 @@ class signal_0d(signal_base):
     This signal class makes use of backends to read data from disk and download from machines.
 
     Args:
-        description (string) : A string defining the signal
-        machines (list of machines) : List of machines on which this signal is defined
-        normalize (bool, optional) : If True, normalize during pre-processing. If False, skip normalization
+        tag (str): Key name for dictionary defined in user_signal.yaml
+        sig_def_fname (bool, optional) : If True, normalize during pre-processing. If False, skip normalization
 
     """
 

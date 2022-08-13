@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # run with
-# python -m unittest tests/test_backends.py
+# python -m unittest tests/test_frnndataset.py
 import unittest
-from xml.sax.handler import feature_external_ges
 import torch
+
 
 import logging
 
@@ -14,7 +14,7 @@ from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.loaders.frnn_dataset import shot_dataset
 
 FORMAT = "%(asctime)s unittest test_frnndataset %(message)s"
-logging.basicConfig(format=FORMAT)
+logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 
 
 class test_frnn_dataset(unittest.TestCase):
