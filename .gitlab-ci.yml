@@ -23,7 +23,9 @@ pages:
     - apt update
     - apt-get install -y python3 python3-pip
     - pip3 install sphinx sphinx-rtd-theme sphinxcontrib-applehelp sphinxcontrib-devhelp sphinxcontrib-htmlhelp sphinxcontrib-jsmath sphinxcontrib-qthelp sphinxcontrib-serializinghtml
-    - cd ./docs/source
+    - cd ./docs
+    - sphinx-apidoc -f -o source ../frnn_loader
+    - cd source
     - sphinx-build -b html . public
     - pwd
     - ls 

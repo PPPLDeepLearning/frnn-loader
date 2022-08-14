@@ -22,9 +22,10 @@ from frnn_loader.utils.errors import (
 class shot_dataset(Dataset):
     """Dataset representing a shot.
 
-    This Dataset replaces the original Shot class.
+    A dataset provides access to multiple signals for a shot
+    through the `__getitem__` method.
 
-    Args:
+    Args
         shotnr (int) :
         machine (:obj:`frnn_loader.backend.machines.machine`)
         predictors (list) :
@@ -34,7 +35,7 @@ class shot_dataset(Dataset):
         download (bool) : If True, download missing data using a data fetcher
         dtype (torch.dtype, optional) : Floating-point
 
-    Attributes:
+    Attributes
         signals_dict (dict) : Dictionary with signals as keys and pre-processed data array of the signal as values
     """
 
@@ -78,15 +79,16 @@ class shot_dataset(Dataset):
 
         This function provides the main interface to make shot data available
         inside the object.
-        First, each signal defined in the signal is loaded.
+        First, each signal defined in `self.predictors` is loaded.
+
         With all signals at hand, a common time-base can be defined.
         Then the signals are clipped to this timebase and resampled
         with the sampling frequency specified in the config object.
 
-        Parameters:
+        Parameters
             conf (dict): global configuration
 
-        Returns:
+        Returns
             None
         """
         logging.info(f"Preprocessing shot {self.shotnr}")
@@ -125,15 +127,22 @@ class shot_dataset(Dataset):
     def _load_signal_data(self):
         """Load signals and time bases for a given shot.
 
-        Output:
+                This happens either through the provided file backend.
+        If this fails and download is True, the provided fetcher will be
+        used to download the file.
+
+        Args
+
+        Output
           time_arrays: List of time bases for the specified signals
           signal_arrays: List of ndarrays for the specified signals
           t_min: Min time of all time bases
           t_max: Max time in all time bases
 
-        Raises:
-
-            BadShotException: Multiple possibilities
+        Raises
+            BadShotException: 
+                * If t_max > t_min. 
+                * If there are multiple bad channels across the diagnostics.
 
         """
         t_min = -1e9  # Smallest time in all time bases
