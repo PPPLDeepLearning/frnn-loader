@@ -140,8 +140,8 @@ class shot_dataset(Dataset):
           t_max: Max time in all time bases
 
         Raises
-            BadShotException: 
-                * If t_max > t_min. 
+            BadShotException:
+                * If t_max > t_min.
                 * If there are multiple bad channels across the diagnostics.
 
         """

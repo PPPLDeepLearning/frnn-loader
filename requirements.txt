@@ -21,6 +21,7 @@ flake8==4.0.1
 fonttools==4.25.0
 future==0.18.2
 hyperopt==0.2.7
+h5py==2.10.0
 idna 
 imagesize==1.4.1
 ipykernel==6.15.1
@@ -32,6 +33,7 @@ jupyter-client==7.3.4
 jupyter-core==4.11.1
 kiwisolver 
 markdown-it-py==2.1.0
+matplotlib==3.5.1
 MarkupSafe==2.1.1
 mccabe==0.6.1
 mdit-py-plugins==0.3.0
