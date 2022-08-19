@@ -8,13 +8,13 @@
     The following columns correspond to individual channels of the signal.
 
     File paths for individual signals are constructed as
-    root/MMM/LocalPath/shotnr.txt.
+    ``root/MMM/LocalPath/shotnr.txt``
 
     Here
-    - root is the root member of the class
-    - MMM is the machine specified for a signal
-    - LocalPath is the LocalPath specified in the signal in `d3d_signals.yaml`
-    - shotnr is the Shot number.
+    * ``root`` is the root member of the class
+    * ``MMM`` is the machine specified for a signal
+    * ``LocalPath`` corresponds to the LocalPath specified in the signal in `d3d_signals.yaml`
+    * ``shotnr`` is the Shot number.
 """
 from os import path as path
 from os import makedirs
@@ -29,7 +29,7 @@ class backend_txt(backend):
     """Backend to store/load from txt files.
 
 
-    Args:
+    Args
         root (string) : Root path of the data directory
         dtype (torch.dtype, optional) : Datatype of the return tensor
     """
@@ -57,7 +57,7 @@ class backend_txt(backend):
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
         file_path = path.join(
-            self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt"
+            self._mapping_path(sig_info, shotnr), f"{shotnr}.txt"
         )
 
         # Perform checks to see that the file is good.
@@ -82,22 +82,76 @@ class backend_txt(backend):
         # After second column is the signal data
         return data[:, 0], data[:, 1:]
 
-    def store(self, sig_info, shotnr, tb, signal):
+    def store(self, sig_info, shotnr, tb, signal_data):
         """Store a signal.
 
-        Args:
+        Calling store will write the signal as a text file.
+
+        Setting up to store will look like this:
+
+        .. code-block::
+
+            from frnn_loader.backends.backend_txt import backend_txt
+            from frnn_loader.backends.fetchers import fetcher_d3d_v1
+            from frnn_loader.primitives.signal import signal_0d
+
+            shotnr = 169018
+            signal = signal_0d("q95")
+            my_fetcher = fetcher_d3d_v1()
+            my_fetcher.fetch(signal.info, shotnr)
+            my_backend = backend_txt("/home/rkube/datasets/frnn/test")
+            xdata, _, zdata, _, _, _ = my_fetcher.fetch(signal.info, 169018)
+
+        Before storing, the directory ``/home/rkube/datasets/frnn/test`` will look like
+
+        .. code-block::
+
+            (frnn2) [rkube@traverse test]$ tree
+            .
+
+            0 directories, 0 files
+
+        Now call store
+
+        .. code-block::
+
+            my_backend.store(signal.info, shotnr, xdata, zdata)
+
+        And the backends will write
+
+        .. code-block::
+
+            (frnn2) [rkube@traverse test]$ tree
+            .
+            └── D3D
+                └── q95
+                    └── 169018.txt
+
+            2 directories, 1 file
+
+        With file contents:
+
+        .. code-block::
+
+            (frnn2) [rkube@traverse test]$ head -n 3 D3D/q95/169018.txt 
+            100.000000 7.31053734e+00
+            120.000000 7.27160072e+00
+            140.000000 8.27995110e+00
+
+
+        Args
             sign_info (dict) : Dictionary generated from signal yaml file
             shotnr (int): Shot number
             tb (torch.tensor): Timebase of the signal
-            signal (torch.tensor): Signal samples
+            signal_data (torch.tensor): Signal samples
 
-        Returns:
+        Returns
             None
         """
         # Concatenate time-base and signal sample tensor
-        all_vals = torch.cat([tb.unsqueeze(1), signal], 1)
+        all_vals = torch.cat([tb.unsqueeze(1), signal_data], 1)
         file_path = path.join(
-            self._construct_file_path(sig_info, shotnr), f"{shotnr}.txt"
+            self._mapping_path(sig_info, shotnr), f"{shotnr}.txt"
         )
 
         # If the directory does not exist yet create it

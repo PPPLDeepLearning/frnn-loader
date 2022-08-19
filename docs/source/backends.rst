@@ -12,6 +12,14 @@ backends.backend module
    :undoc-members:
    :show-inheritance:
 
+backends.backend\_hdf5 module
+-----------------------------
+
+.. automodule:: backends.backend_hdf5
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 backends.backend\_txt module
 ----------------------------
 
