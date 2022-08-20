@@ -90,7 +90,7 @@ class backend:
         >>> my_backend._construct_file_path(signa_fs07.info, 180400)
             /home/rkube/datasets/frnn/dataset01/d3d/fs07/180400.txt
 
-        This routine accesses dictionary keys ``Machine`` and ``LocalPath`` 
+        This routine accesses dictionary keys ``Machine`` and ``LocalPath``
         defined through `d3d_signals.yaml`
 
 

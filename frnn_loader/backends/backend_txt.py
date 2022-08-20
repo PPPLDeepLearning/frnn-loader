@@ -56,9 +56,7 @@ class backend_txt(backend):
         # Construct the path where a signal is stored for the specified machine
         # root/machine.name/signal.path/shot_number.txt
         # For this we need to pick the correct path from the signal.
-        file_path = path.join(
-            self._mapping_path(sig_info, shotnr), f"{shotnr}.txt"
-        )
+        file_path = path.join(self._mapping_path(sig_info, shotnr), f"{shotnr}.txt")
 
         # Perform checks to see that the file is good.
         if not path.isfile(file_path):
@@ -133,7 +131,7 @@ class backend_txt(backend):
 
         .. code-block::
 
-            (frnn2) [rkube@traverse test]$ head -n 3 D3D/q95/169018.txt 
+            (frnn2) [rkube@traverse test]$ head -n 3 D3D/q95/169018.txt
             100.000000 7.31053734e+00
             120.000000 7.27160072e+00
             140.000000 8.27995110e+00
@@ -150,9 +148,7 @@ class backend_txt(backend):
         """
         # Concatenate time-base and signal sample tensor
         all_vals = torch.cat([tb.unsqueeze(1), signal_data], 1)
-        file_path = path.join(
-            self._mapping_path(sig_info, shotnr), f"{shotnr}.txt"
-        )
+        file_path = path.join(self._mapping_path(sig_info, shotnr), f"{shotnr}.txt")
 
         # If the directory does not exist yet create it
         if not path.isdir(path.dirname(file_path)):

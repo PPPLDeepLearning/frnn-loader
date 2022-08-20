@@ -25,13 +25,13 @@ class backend_hdf5(backend):
         root (string): Root path of the data directory
         dtype (torch.dtype, optionla) : Datatype to use. Defaults to float32
     """
-    
+
     def __init__(self, root, dtype=torch.float32):
         super().__init__(root, dtype)
         # Later, self.dtype is passed to hdf5 library calls. And the HDF5 library
         # only accpets numpy datatypes.
         if dtype is torch.float32:
-            self.dtype = 'f'
+            self.dtype = "f"
 
     def _mapping_path(self, sig_info, shotnr):
         return join(self.root, sig_info["Machine"])
@@ -40,17 +40,17 @@ class backend_hdf5(backend):
         """Load data."""
         map_to = self._mapping_path(sig_info, shotnr)
         fp = h5py.File(join(map_to, f"{shotnr}.h5"), "r")
-        
+
         try:
-            tb = torch.tensor(fp[sig_info['LocalPath']]["tb"][:])
-            data = torch.tensor(fp[sig_info['LocalPath']]["zdata"][:])
+            tb = torch.tensor(fp[sig_info["LocalPath"]]["tb"][:])
+            data = torch.tensor(fp[sig_info["LocalPath"]]["zdata"][:])
         except ValueError as e:
-            logging.error(f"Unable to load timebase/signal for shot {shotnr} signal {sig_info['LocalPath']}")
+            logging.error(
+                f"Unable to load timebase/signal for shot {shotnr} signal {sig_info['LocalPath']}"
+            )
             raise e
-        
+
         return tb, data
-        
-        
 
     def store(self, sig_info, shotnr, tb, signal_data):
         """Store a signal.
@@ -67,17 +67,21 @@ class backend_hdf5(backend):
 
         with h5py.File(join(map_to, f"{shotnr}.h5"), "a") as df:
             try:
-                grp = df.create_group(sig_info['LocalPath'])
-                grp.attrs.create("origin", f"MDS {sig_info['MDSTree']}::{sig_info['MDSPath']}")
-                
+                grp = df.create_group(sig_info["LocalPath"])
+                grp.attrs.create(
+                    "origin", f"MDS {sig_info['MDSTree']}::{sig_info['MDSPath']}"
+                )
+
                 dset = grp.create_dataset("tb", tb.shape, dtype=self.dtype)
                 dset[:] = tb[:]
 
                 dset = grp.create_dataset("zdata", signal_data.shape, dtype=self.dtype)
                 dset[:] = signal_data[:]
             except Exception as err:
-                logging.error(f"Failed to write {sig_info['Description']} to HDF5: {err}")
-                raise(err)
+                logging.error(
+                    f"Failed to write {sig_info['Description']} to HDF5: {err}"
+                )
+                raise (err)
         logging.info("Wrote {sig_info['Description'] to {grp}.")
 
 

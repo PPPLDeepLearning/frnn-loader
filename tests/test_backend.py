@@ -39,12 +39,11 @@ class test_backends(unittest.TestCase):
         
         * Delete temp directory.
         """
-        pass
-        # try:
-        #     shutil.rmtree(cls.root)  # delete directory
-        # except OSError as exc:
-        #     if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
-        #         raise  # re-raise exception
+        try:
+            shutil.rmtree(cls.root)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception
 
     
 
