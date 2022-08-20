@@ -27,8 +27,7 @@ class shot_dataset(Dataset):
 
     Args
         shotnr (int) :
-        machine (:obj:`frnn_loader.backend.machines.machine`)
-        predictors (list) :
+        predictors (list) : List of signals
         resampler (resampler) : Re-sampler to use
         backend_file (backend) : Backend to use for loading data from the file system
         backend_fetcher (fetcher) : Data fetcher to use when downloading data
@@ -63,10 +62,9 @@ class shot_dataset(Dataset):
         if self.download:
             assert self.backend_fetcher is not None
 
-        # signal_dict is a dict with
-        # Keys: signals defined in predictors
-        # Values: Signal samples interpolated on a common time-base.
-        # It is populated by self._preprocess()
+        # Construct a tensor that will hold the data.
+        # The dimensions consist of sum of channels over all predictors and
+        # the length of the time-interval that we resample to.
         self.total_channels = sum([sig.num_channels for sig in self.predictors])
         self.signal_tensor = torch.zeros(
             (len(self.resampler), self.total_channels), dtype=self.dtype
