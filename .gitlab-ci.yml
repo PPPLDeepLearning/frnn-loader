@@ -51,7 +51,7 @@ unit-test-job:   # This job runs in the test stage.
   script:
     - echo "Running unit tests... This will take about 60 seconds."
     - apt update
-    - apt-get install -y python3 python3-pip libhdf5-serial-dev
+    - apt-get install -y python3 python3-pip libhdf5-serial-dev python3-h5py
     - pip3 install -r requirements.txt
     - pip3 install -e .
     - pwd
