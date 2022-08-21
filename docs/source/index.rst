@@ -14,14 +14,14 @@ Here is a basic example to get started:
 
 .. code-block:: 
     
-      from frnn_loader.primitives.resamplers import resampler_last
+      from frnn_loader.primitives.resamplers import resampler_causal
       from frnn_loader.backends.backend_txt import backend_txt
       from frnn_loader.backends.fetchers import fetcher_d3d_v1
       from frnn_loader.primitives.signal import signal_0d
       from frnn_loader.loaders.frnn_dataset import shot_dataset
 
       # Re-sample the signal onto the interval [0.0:2.0] seconds, using a time-step of 1ms:
-      my_resampler = resampler_last(0.0, 2.0, 1e-3)
+      my_resampler = resampler_causal(0.0, 2.0, 1e-3)
 
       # Instantiate a file backend. This implies that all signals are stored in the 
       # path pointed to by root:

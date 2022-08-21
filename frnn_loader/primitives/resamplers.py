@@ -38,7 +38,7 @@ class resampler:
             tb_new (torch.tensor) : New time bsae
             sig_new (torch.tensor) : Re-sampled signal
         """
-        assert(tb.dtype == sig.dtype == self.dtype)
+        assert tb.dtype == sig.dtype == self.dtype
         sort_idx = torch.argsort(tb)
         tb = tb[sort_idx]
         sig = sig[sort_idx, :]

@@ -16,13 +16,13 @@ To define a Dataset for one D3D discharge using filterscope, q95, and pedestal e
 ```python
 import torch
 
-from frnn_loader.primitives.resamplers import resampler_last
+from frnn_loader.primitives.resamplers import resampler_causal
 from frnn_loader.backends.backend_txt import backend_txt
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.loaders.frnn_dataset import shot_dataset
 
-my_resampler = resampler_last(0.0, 2.0, 1e-3)
+my_resampler = resampler_causal(0.0, 2.0, 1e-3)
 
 # Instantiate a file backend
 my_backend_file = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021/")

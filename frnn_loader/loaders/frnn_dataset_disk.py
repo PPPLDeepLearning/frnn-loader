@@ -13,12 +13,13 @@ from torch.utils.data import Dataset
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.utils.errors import SignalCorruptedError, NotDownloadedError
 
+
 class shot_dataset_disk(Dataset):
     """Dataset representing a shot which uses disk data as storage
-    
+
     This dataset maps the __getitem__ method to a pre-cached version on disk.
-    The cached version on disk is built 
-    * Using the predictors and targets 
+    The cached version on disk is built
+    * Using the predictors and targets
     * With all transformations applied to them.
 
     Args
@@ -32,9 +33,21 @@ class shot_dataset_disk(Dataset):
     * download (bool) - If true, downloadin missing data
     * transform (transform) - Transformations applied to data
     * dtype
-    
+
     """
-    def __init__(self, shotnr, predictors, resampler, backend_file, fetcher, root, download=False, transform=None, dtype=torch.float32):
+
+    def __init__(
+        self,
+        shotnr,
+        predictors,
+        resampler,
+        backend_file,
+        fetcher,
+        root,
+        download=False,
+        transform=None,
+        dtype=torch.float32,
+    ):
         """Initializes the disk dataset."""
         self.shotnr = shotnr
         self.predictors = predictors
@@ -74,7 +87,7 @@ class shot_dataset_disk(Dataset):
                 except SignalCorruptedError as err:
                     logging.error(f"SignalCorrupted occured: {err}")
                     invalid_signals += 1
-                    raise(err)
+                    raise (err)
 
                 except NotDownloadedError as err:
                     logging.error(f"Signal not downloaded: {err}")
@@ -83,7 +96,9 @@ class shot_dataset_disk(Dataset):
                         tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(
                             signal.info, self.shotnr
                         )
-                        self.backend_file.store(signal.info, self.shotnr, tb, signal_data)
+                        self.backend_file.store(
+                            signal.info, self.shotnr, tb, signal_data
+                        )
                     else:
                         raise err
 
@@ -102,18 +117,12 @@ class shot_dataset_disk(Dataset):
 
                 # 3rd step: store processed data in HDF5
                 grp = h5_grp_trf.create_group(signal.info["LocalPath"])
-                dset = grp.create_dataset("signal_data", signal_data_rs.shape, dtype="f")
+                dset = grp.create_dataset(
+                    "signal_data", signal_data_rs.shape, dtype="f"
+                )
                 dset[:] = signal_data_rs[:]
                 dset = grp.create_dataset("timebase", tb_rs.shape, dtype="f")
                 dset[:] = tb_rs[:]
-
-
-
-
-
-
-
-
 
 
 # end of file frnn_dataset_disk.py
