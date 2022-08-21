@@ -4,13 +4,13 @@
 import unittest
 
 import torch
-from frnn_loader.primitives.resamplers import resampler_last
+from frnn_loader.primitives.resamplers import resampler_causal
 import matplotlib.pyplot as plt
 
 
-class test_resampler_last(unittest.TestCase):
+class test_resampler_causal(unittest.TestCase):
     """Test routines for resampler."""
-    def test_resampler_last(self):
+    def test_resampler_causal(self):
         """Test whether resampling is reasonable"""
         # Define a signal that we will resample
         tb_old = torch.arange(0.15, 1.14, 0.07)
@@ -19,7 +19,7 @@ class test_resampler_last(unittest.TestCase):
         sig_old = sig_old.unsqueeze(1)
 
         # Resampler on new time interval
-        my_resampler = resampler_last(0.0, 1.0, 1e-2)
+        my_resampler = resampler_causal(0.0, 1.0, 1e-2)
         tb_new, sig_new = my_resampler(tb_old, sig_old)
 
         # Get the over-lapping part of the time bases

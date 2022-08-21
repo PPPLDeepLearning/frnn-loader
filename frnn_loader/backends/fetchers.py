@@ -44,10 +44,11 @@ class fetcher_d3d_v1:
 
     """
 
-    def __init__(self, mds_hostname="atlas.gat.com"):
+    def __init__(self, mds_hostname="atlas.gat.com", dtype=torch.float32):
         # Connect to D3D MDplus server
         self.mds_hostname = mds_hostname
         self.conn = mds.Connection(mds_hostname)
+        self.dtype = dtype
 
     def fetch(self, signal_info, shotnr):
         """Fetch data from D3D MDS server
@@ -119,7 +120,7 @@ class fetcher_d3d_v1:
             )
 
         if xdata is not None:
-            xdata = torch.tensor(xdata)
+            xdata = torch.tensor(xdata, dtype=self.dtype)
             if torch.any(torch.isinf(xdata)).item():
                 raise RuntimeWarning("zdata contains inf values")
 
@@ -127,7 +128,7 @@ class fetcher_d3d_v1:
                 raise RuntimeWarning("zdata contains NaN values")
 
         if ydata is not None:
-            ydata = torch.tensor(ydata)
+            ydata = torch.tensor(ydata, dtype=self.dtype)
             if torch.any(torch.isinf(ydata)).item():
                 raise RuntimeWarning("ydata contains inf values")
 
@@ -135,7 +136,7 @@ class fetcher_d3d_v1:
                 raise RuntimeWarning("ydata contains NaN values")
 
         if zdata is not None:
-            zdata = torch.tensor(zdata)
+            zdata = torch.tensor(zdata, dtype=self.dtype)
             if torch.any(torch.isinf(zdata)).item():
                 raise RuntimeWarning("xdata contains inf values")
 

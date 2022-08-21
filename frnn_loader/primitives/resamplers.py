@@ -1,9 +1,9 @@
 # coding: utf-8 -*-
 """Resamplers are used to bring signal data onto a common time-base.
 
-Most diagnostics sample measurements on their own time-base. To
-make a collection of signals available for deep neural network training
-we have to bring them to a common time-base.
+Diagnostics sample measurements on their own time-base. To
+make a collection of signals available for deep neural network training,
+they need to be re-sampled onto a common time-base.
 """
 
 import torch
@@ -13,19 +13,22 @@ class resampler:
     """Abstract basis class.
 
     Args:
-        t_min (float) : Starting time of the resampling time-base
-        t_max (float) : End time of the resampling time-base
+        t_start (float) : Starting time of the resampling time-base
+        t_end (float) : End time of the resampling time-base
         dt (float) : Sample spacing
 
     """
 
-    def __init__(self, t_min, t_max, dt):
-        self.t_min = t_min
-        self.t_max = t_max
+    def __init__(self, t_start, t_end, dt, dtype=torch.float32):
+        self.t_start = t_start
+        self.t_end = t_end
         self.dt = dt
+        self.dtype = dtype
 
     def __call__(self, tb, sig):
-        """Resample a signaal.
+        """Resample a signal.
+
+        The data type of the new time-base and the resampled signal is defined by self.dtype
 
         Args:
             tb (torch.tensor) : Time-base of input signal
@@ -35,13 +38,14 @@ class resampler:
             tb_new (torch.tensor) : New time bsae
             sig_new (torch.tensor) : Re-sampled signal
         """
+        assert(tb.dtype == sig.dtype == self.dtype)
         sort_idx = torch.argsort(tb)
         tb = tb[sort_idx]
         sig = sig[sort_idx, :]
         num_channels = sig.shape[1]
         # Allocate tensors for new time base and re-sampled signal
-        tb_new = torch.arange(self.t_min, self.t_max, self.dt, dtype=tb.dtype)
-        sig_new = torch.zeros((len(tb_new), num_channels), dtype=sig.dtype)
+        tb_new = torch.arange(self.t_start, self.t_end, self.dt, dtype=self.dtype)
+        sig_new = torch.zeros((len(tb_new), num_channels), dtype=self.dtype)
 
         for i in range(num_channels):
             sig_new[:, i] = self._interp(sig[:, i], tb, tb_new)
@@ -54,10 +58,10 @@ class resampler:
         return tb_new, sig_new
 
     def __len__(self):
-        return int((self.t_max - self.t_min) / self.dt)
+        return int((self.t_end - self.t_start) / self.dt)
 
 
-class resampler_last(resampler):
+class resampler_causal(resampler):
     """Uses last previous sample.
 
     Given a signal sampled with sampling rate dt_old, we wish to re-sample

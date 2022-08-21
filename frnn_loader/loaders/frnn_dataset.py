@@ -169,24 +169,20 @@ class shot_dataset(Dataset):
                 if self.download:
                     logging.info(f"Downloading signal {signal}")
                     # TODO: Download signal
-                    if type(signal) == signal_0d:
-                        tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(
-                            signal.info, self.shotnr
-                        )
-                        self.backend_file.store(
-                            signal.info, self.shotnr, tb, signal_data
-                        )
+                    tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(
+                        signal.info, self.shotnr
+                    )
+                    self.backend_file.store(signal.info, self.shotnr, tb, signal_data)
 
                 else:
                     raise err
 
-            log_msg = (
+            logging.info(
                 f"Loaded signal {signal}: tb.shape = "
                 + str(tb.shape)
                 + ", signal.shape = "
                 + str(signal_data.shape)
             )
-            logging.info(log_msg)
 
             # At this point, assume that the loaded data is good.
             # Update t_min and append signal and timebase to the working data
