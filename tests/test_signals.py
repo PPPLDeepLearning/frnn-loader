@@ -4,6 +4,8 @@
 import unittest
 import logging
 import tempfile
+import shutil
+import errno
 from os import environ
 
 from frnn_loader.backends.backend_txt import backend_txt
@@ -16,41 +18,49 @@ logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 
 class TestSignals(unittest.TestCase):
     """Test routines for machines."""
+    @classmethod
+    def setUpClass(cls):
+        """Set up signals tests
+        * Define a temp directory
+        """
+        # The working dir should be empty. Test will fail if not empty.
+        try:
+            cls.tmpdir = environ["TMPDIR"]
+        except KeyError:
+            cls.tmpdir = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+        cls.shotnr = 180619
 
-    def test_signal_fs07(self):
-        """Test whether we can instantiate fs07 signal"""
-        my_backend = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021")
-        #fs07 = signal_0d("filterscope fs07", ['fs07'], [MachineD3D])
-        # Instantiate a 0d signal.
-        fs07 = signal_0d("fs07")
-        fs07.load_data(184800, my_backend)
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down signal tests.
+        
+        * Remove temp directory."""
+        try:
+            shutil.rmtree(cls.tmpdir)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception
+
 
     def test_signals_0d(self):
         """Compare downloaded signal shape to data read from backend."""
-        shotnr = 180619
         sig_names = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
                      "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
                      "iptdirect", "iptarget",
                      "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
-        # The working dir should be empty. Test will fail if not empty.
-        try:
-            tmpdir = environ["TMPDIR"]
-        except KeyError:
-            tmpdir = tempfile.mkdtemp(dir="/home/rkube/tmp/")
-
-        my_backend = backend_txt(tmpdir)
+        my_backend = backend_txt(self.tmpdir)
         my_fetcher = fetcher_d3d_v1()
 
         for name in sig_names:
             signal = signal_0d(name)
             # Download the signal
-            xdata, _, zdata, _, _, _ = my_fetcher.fetch(signal.info, shotnr)
+            xdata, _, zdata, _, _, _ = my_fetcher.fetch(signal.info, self.shotnr)
             # Write it to file using the backend.
-            my_backend.store(signal.info, shotnr, xdata, zdata)
+            my_backend.store(signal.info, self.shotnr, xdata, zdata)
 
             # Now read it again using the same backend.
-            tb, sig_data = my_backend.load(signal.info, shotnr)
+            tb, sig_data = my_backend.load(signal.info, self.shotnr)
 
             assert((tb - xdata).mean() < 1e-8)
             assert((sig_data - zdata).mean() < 1e-8)
