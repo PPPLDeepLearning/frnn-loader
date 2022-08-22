@@ -10,7 +10,7 @@ The ``LocalPath`` of the `signal.yaml` files is mapped to a dataset.
 import logging
 import numpy as np
 import torch
-from os import mkdir
+from os import makedirs
 from os.path import join, isdir
 import h5py
 
@@ -39,6 +39,7 @@ class backend_hdf5(backend):
     def load(self, sig_info, shotnr):
         """Load data."""
         map_to = self._mapping_path(sig_info, shotnr)
+        
         fp = h5py.File(join(map_to, f"{shotnr}.h5"), "r")
 
         try:
@@ -63,7 +64,7 @@ class backend_hdf5(backend):
 
         # If the base directory does not exist, create it.
         if not isdir(map_to):
-            mkdir(map_to)
+            makedirs(map_to)
 
         with h5py.File(join(map_to, f"{shotnr}.h5"), "a") as df:
             try:
