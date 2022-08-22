@@ -31,7 +31,7 @@ class signal_base:
             self.root = root
         sig_def_fname = join(self.root, "d3d_signals.yaml")
 
-        #print("path = ", sig_def_fname)
+        # print("path = ", sig_def_fname)
         self.tag = tag
         with open(sig_def_fname, "r") as df:
             signal_defs = yaml.load(df, Loader=yaml.FullLoader)
