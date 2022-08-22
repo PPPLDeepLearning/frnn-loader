@@ -22,11 +22,7 @@ class signal_base:
 
     """
 
-    def __init__(
-        self,
-        tag,
-        root=None
-    ):
+    def __init__(self, tag, root=None):
         # If no root path is given, we just use the path to the data files in the repo
         if root is None:
             base_path = Path(__file__).parent
@@ -34,7 +30,7 @@ class signal_base:
         else:
             self.root = root
         sig_def_fname = join(self.root, "d3d_signals.yaml")
-        
+
         print("path = ", sig_def_fname)
         self.tag = tag
         with open(sig_def_fname, "r") as df:

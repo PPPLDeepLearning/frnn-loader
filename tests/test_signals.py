@@ -4,7 +4,7 @@
 import unittest
 import logging
 import tempfile
-from os import makedirs
+from os import environ
 
 from frnn_loader.backends.backend_txt import backend_txt
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
@@ -34,9 +34,12 @@ class TestSignals(unittest.TestCase):
                      "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
         # The working dir should be empty. Test will fail if not empty.
-        wd = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+        try:
+            tmpdir = environ["TMPDIR"]
+        except KeyError:
+            tmpdir = tempfile.mkdtemp(dir="/home/rkube/tmp/")
 
-        my_backend = backend_txt(wd)
+        my_backend = backend_txt(tmpdir)
         my_fetcher = fetcher_d3d_v1()
 
         for name in sig_names:

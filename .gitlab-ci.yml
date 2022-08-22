@@ -59,8 +59,10 @@ unit-test-job:   # This job runs in the test stage.
     - pip3 install -e .
     - pwd
     - ls 
+    - export TMPDIR=/tmp
     - python3 -m unittest tests/test_resampling.py
     - python3 -m unittest tests/test_fetchers.py
+    - python3 -m unittest tests/test_signals.py
     - echo "Code coverage is 90%"
 
 lint-test-job:   # This job also runs in the test stage.
