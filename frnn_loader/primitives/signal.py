@@ -5,6 +5,8 @@ Class representations of measurement signals.
 
 """
 
+from pathlib import Path
+from os.path import join
 import logging
 import yaml
 from frnn_loader.utils.errors import NotDownloadedError, SignalCorruptedError
@@ -23,8 +25,17 @@ class signal_base:
     def __init__(
         self,
         tag,
-        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml",
+        root=None
     ):
+        # If no root path is given, we just use the path to the data files in the repo
+        if root is None:
+            base_path = Path(__file__).parent
+            self.root = join(base_path, "..", "data")
+        else:
+            self.root = root
+        sig_def_fname = join(self.root, "d3d_signals.yaml")
+        
+        print("path = ", sig_def_fname)
         self.tag = tag
         with open(sig_def_fname, "r") as df:
             signal_defs = yaml.load(df, Loader=yaml.FullLoader)
@@ -101,7 +112,7 @@ class signal_0d(signal_base):
     def __init__(
         self,
         tag,
-        sig_def_fname="/home/rkube/repos/frnn-loader/frnn_loader/data/d3d_signals.yaml",
+        sig_def_fname=None,
     ):
         super().__init__(tag, sig_def_fname)
         self.num_channels = 1
