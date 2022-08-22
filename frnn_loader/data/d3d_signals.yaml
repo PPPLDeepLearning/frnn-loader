@@ -174,8 +174,8 @@ tmfreq1:
 tmfreq2:
   Machine: D3D
   Description: Tearing Mode frequency, rotating 3/2
-  PTData: nssfrqn1l
-  LocalPath: nssfrqn1l
+  PTData: nssfrqn2l
+  LocalPath: nssfrqn2l
   ndim: 0
   Channels: 1
 

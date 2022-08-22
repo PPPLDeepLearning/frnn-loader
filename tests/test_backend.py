@@ -2,10 +2,11 @@
 # run with
 # python -m unittest tests/test_backends.py
 import unittest
+import logging
 import tempfile
 import shutil
 import errno
-
+from os import environ
 
 import torch
 from frnn_loader.backends.backend_txt import backend_txt
@@ -14,7 +15,8 @@ from frnn_loader.backends.fetchers import fetcher_d3d_v1
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.utils.errors import NotDownloadedError, BadDownloadError
 
-unittest.TestLoader.sortTestMethodsUsing = None
+FORMAT = "%(asctime)s unittest test_frnndataset %(message)s"
+logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 
 class test_backends(unittest.TestCase):
     """Test routines for machines."""
@@ -27,9 +29,15 @@ class test_backends(unittest.TestCase):
         * Define a shot
         * Define a list of signals to use
         """
-        cls.root = tempfile.mkdtemp(dir="/home/rkube/frnn/")
+        try:
+            cls.root = environ["TMPDIR"]
+        except KeyError:
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
         cls.shotnr = 180619
-        cls.signal_list = ["fs07", "q95"]
+        cls.signal_list = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
+                     "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "iptarget",
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
     
     @classmethod
@@ -49,9 +57,10 @@ class test_backends(unittest.TestCase):
         """Store and successively load data from the txt backend."""
         fetcher = fetcher_d3d_v1()
         my_backend = backend_txt(self.root)
-
+        logging.info("-> Testing backend_txt")
         # Iterate over data that has been downloaded.
         for sig_name in self.signal_list:
+            logging.info(f"backend_txt: testing {sig_name}")
             # Instantiate a signal
             signal = signal_0d(sig_name)
             # Try using the backend to access the data for the given signal and shot
@@ -85,8 +94,9 @@ class test_backends(unittest.TestCase):
         """Store and successively load data from HDF5 backend."""
         fetcher = fetcher_d3d_v1()
         my_backend = backend_hdf5(self.root)
-
+        logging.info("-> Testing backend_hdf5")
         for sig_name in self.signal_list:
+            logging.info(f"backend_hdf5: testing {sig_name}")
             # Instantiate a signal
             signal = signal_0d(sig_name)
             # Try using the backend to access the data for the given signal and shot

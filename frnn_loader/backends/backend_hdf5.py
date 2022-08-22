@@ -68,21 +68,24 @@ class backend_hdf5(backend):
         with h5py.File(join(map_to, f"{shotnr}.h5"), "a") as df:
             try:
                 grp = df.create_group(sig_info["LocalPath"])
+            except ValueError as err:
+                logging.error(f"ValueError: {sig_info['LocalPath']} err={err}")
+                raise err
+            # Just assume that the signal is from MDS to construct the orgin attribute.
+            try:
                 grp.attrs.create(
                     "origin", f"MDS {sig_info['MDSTree']}::{sig_info['MDSPath']}"
                 )
+            except KeyError as err:
+                # If this fails, construct the origin from the PTdata name
+                grp.attrs.create("origin", f"PTDATA {sig_info['PTData']}")
 
-                dset = grp.create_dataset("tb", tb.shape, dtype=self.dtype)
-                dset[:] = tb[:]
+            dset = grp.create_dataset("tb", tb.shape, dtype=self.dtype)
+            dset[:] = tb[:]
 
-                dset = grp.create_dataset("zdata", signal_data.shape, dtype=self.dtype)
-                dset[:] = signal_data[:]
-            except Exception as err:
-                logging.error(
-                    f"Failed to write {sig_info['Description']} to HDF5: {err}"
-                )
-                raise (err)
-        logging.info("Wrote {sig_info['Description'] to {grp}.")
+            dset = grp.create_dataset("zdata", signal_data.shape, dtype=self.dtype)
+            dset[:] = signal_data[:]
+            logging.info(f"Wrote {sig_info['Description']} to {grp}.")
 
 
 # end of file backend_hdf5.py
