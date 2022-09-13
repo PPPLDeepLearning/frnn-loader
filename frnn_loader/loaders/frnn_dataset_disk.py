@@ -58,19 +58,24 @@ class shot_dataset_disk(Dataset):
         self.download = download
         self.transform = transform
         self.dtype = dtype
+        # Pre-calculate the array shape. That is, the sum of the channels over all predictors
+        self.sum_all_channels = sum([pred.num_channels for pred in self.predictors])
+        # Add iteration capabilities
+        self._current_index = 0
 
         # Create a temporary file for the dataset.
-
         # If we want to download we need to have a fetcher bassed
         if self.download:
             assert self.fetcher is not None
 
-        # Create a temporary file name for HDF5 storage
+        # Create a temporary file name for HDF5 storage.
+        # Note that this is not the original data file.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
         with h5py.File(self.tmp_fname, "a") as fp:
             # In the data-loading stage data will be signal by signal. The transformed and
             # resampled signals are stored in HDF5
             h5_grp_trf = fp.create_group("transformed")
+            h5_grp_trf.attrs["shotnr"] = self.shotnr
 
             # Next is pre-processing. We attack it like this
             # 1. Fetch the signals
@@ -93,36 +98,127 @@ class shot_dataset_disk(Dataset):
                     logging.error(f"Signal not downloaded: {err}")
                     if self.download:
                         logging.info(f"Downloading signal {signal}")
-                        tb, _, signal_data, _, _, _ = self.backend_fetcher.fetch(
-                            signal.info, self.shotnr
-                        )
+                        tb, _, signal_data, _, _, _ = self.fetcher.fetch(signal.info, self.shotnr                        )
                         self.backend_file.store(
                             signal.info, self.shotnr, tb, signal_data
                         )
                     else:
                         raise err
 
-                logging.info(
-                    f"Loaded signal {signal}: tb.shape = "
-                    + str(tb.shape)
-                    + ", signal.shape = "
-                    + str(signal_data.shape)
-                )
+                logging.info(f"Loaded signal {signal}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}")
 
                 # 2nd step: Re-sample
                 tb_rs, signal_data_rs = resampler(tb, signal_data)
+                logging.info(f"Resampled signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}")
                 # 3rd step: Transform
                 if transform is not None:
-                    signal_data = self.transform(signal_data)
+                    signal_data_rs = self.transform(signal_data_rs)
+                logging.info(f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}")
 
-                # 3rd step: store processed data in HDF5
-                grp = h5_grp_trf.create_group(signal.info["LocalPath"])
+                # 4th step: store processed data in HDF5
+                grp = h5_grp_trf.create_group(signal.info["LocalPath"] + "_trf")
                 dset = grp.create_dataset(
                     "signal_data", signal_data_rs.shape, dtype="f"
                 )
                 dset[:] = signal_data_rs[:]
                 dset = grp.create_dataset("timebase", tb_rs.shape, dtype="f")
                 dset[:] = tb_rs[:]
+
+
+    def __len__(self):
+        return len(self.resampler)
+
+
+    def __getitem__(self, idx):
+        """Fetches a single sample.
+
+        Note: Performance could be improved by implementing slicing directly here:
+        https://discuss.pytorch.org/t/dataloader-sample-by-slices-from-dataset/113005/5
+        """
+        if torch.is_tensor(idx):
+            print("idx is a tensor")
+            # Sorted indices
+            sort_idx = torch.argsort(idx)
+            idx_sorted = idx[sort_idx]
+
+            # Using the argsort trick to get the original indices
+            sort_idx2 = torch.argsort(sort_idx)
+            idx_orig = idx[sort_idx[sort_idx2]]
+
+            assert(all(idx_orig == idx))
+
+            idx = idx.tolist()
+            idx_sorted = idx_sorted.tolist()
+
+            # Number of elements to fetch
+            num_ele = len(idx)
+        else:
+            num_ele = 1
+
+        # HDF5 requires sorted indices for access. Argsorting twice can reverse one argsort:
+        """
+        # Array with random indices
+        idx_orig = np.array([1, 2, 9, 3, 4, 8, 5])
+        idx = np.zeros_like(idx_orig)
+        idx[:] = idx_orig[:]
+
+        # sort_idx is the array that induces an order on idx
+        sort_idx = np.argsort(idx)
+        print(sort_idx, idx[sort_idx])
+
+        # Applying argsort to sort_idx gives us an array that allows us to re-construct the original shuffling
+        sort_idx2 = np.argsort(sort_idx)
+        print(idx[sort_idx[sort_idx2]])
+
+        idx[sort_idx[sort_idx2]] == idx_orig
+        """
+
+        output = torch.zeros((num_ele, self.sum_all_channels), dtype=self.dtype)
+
+        current_ch = 0
+        with h5py.File(self.tmp_fname, "r") as fp:
+            for pred in self.predictors:
+                if isinstance(idx, list):
+                    tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx_sorted]
+                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][idx_sorted, :]
+                else:
+                    tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx]
+                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][idx, :]
+
+                # Access pattern for 0d signals
+                if isinstance(pred, signal_0d):
+                    if isinstance(idx, list):
+                        output[:, current_ch:current_ch + pred.num_channels] = torch.tensor(data[sort_idx2.tolist(), :])
+                    else:
+                        output[0, current_ch:current_ch + pred.num_channels] = float(data)
+                else:
+                    # TODO: Implement me
+                    raise NotImplementedError("Access for 1D data not implemented yet")
+
+                current_ch += pred.num_channels
+        
+        return output
+
+    def __iter__(self):
+        """Iterator"""
+        return self
+    
+    def __next__(self):
+        """Implement iterable capability"""
+        if self._current_index < self.__len__():
+            rval = self.__getitem__(self._current_index)
+            self._current_index += 1
+            return rval
+        
+        raise StopIteration
+
+
+
+
+
+
+
+
 
 
 # end of file frnn_dataset_disk.py

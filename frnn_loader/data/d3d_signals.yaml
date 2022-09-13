@@ -147,6 +147,15 @@ iptarget:
   ndim: 0
   Channels: 1
 
+iperr:
+  Machine: D3D
+  Description: Plasma current error
+  PTData: ipeecoil
+  LocalPat: ipeecoil
+  ndim: 0
+  Channels: 1
+
+
 tmamp1:
   Machine: D3D
   Description: Tearing Mode amplitude, rotating 2/1

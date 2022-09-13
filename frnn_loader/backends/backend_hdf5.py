@@ -23,7 +23,7 @@ class backend_hdf5(backend):
 
     Args
         root (string): Root path of the data directory
-        dtype (torch.dtype, optionla) : Datatype to use. Defaults to float32
+        dtype (torch.dtype, optional) : Datatype to use. Defaults to float32
     """
 
     def __init__(self, root, dtype=torch.float32):
@@ -37,19 +37,36 @@ class backend_hdf5(backend):
         return join(self.root, sig_info["Machine"])
 
     def load(self, sig_info, shotnr):
-        """Load data."""
+        """Load data.
+
+        Args
+            sig_info (string): Signal info
+            shotnr (int): shot number
+
+        Raises
+
+            NotDownloadedError - When the HDF5 file with the shot number is not found.
+        """
         map_to = self._mapping_path(sig_info, shotnr)
-        
-        fp = h5py.File(join(map_to, f"{shotnr}.h5"), "r")
+
+        # Try loading the signal from file. If we can't find the file assume we haven't
+        # downloaded the data and raise the appropriate error
+        fname = join(map_to, f"{shotnr}.h5")
+        try:
+            fp = h5py.File(fname, "r")
+        except (FileNotFoundError, OSError) as e:
+            err_str = f"Unable to open file {fname}"
+            logging.error(err_str)
+            raise NotDownloadedError(err_str)
 
         try:
             tb = torch.tensor(fp[sig_info["LocalPath"]]["tb"][:])
             data = torch.tensor(fp[sig_info["LocalPath"]]["zdata"][:])
-        except ValueError as e:
-            logging.error(
-                f"Unable to load timebase/signal for shot {shotnr} signal {sig_info['LocalPath']}"
-            )
-            raise e
+        except (ValueError, KeyError) as e:
+            fp.close()
+            err_str = f"Unable to load timebase/signal for shot {shotnr} signal {sig_info['LocalPath']}"
+            logging.error(err_str)
+            raise NotDownloadedError(err_str)
 
         return tb, data
 

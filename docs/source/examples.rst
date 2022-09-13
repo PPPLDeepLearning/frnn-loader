@@ -29,3 +29,44 @@ This example assumes that all signal data is available in "/home/rkube/datasets/
 Data loading from disk is handled using a :class:`frnn_loader.backends.backend_txt` object.
 
 
+Data sources for the `D3D_0D` test case
+
++------------------------------+-------------+
+|  Signal description          | short name  |
++==============================+=============+
+|q95 safety factor             |  q95        |
++------------------------------+-------------+
+|internal inductance           | efsli       |
++------------------------------+-------------+
+|plasma current                | ipspr15v    |
++------------------------------+-------------+
+|Normalized Beta               | efsbetan    |
++------------------------------+-------------+
+|stored energy                 | efswmhd     |
++------------------------------+-------------+
+|Locked mode amplitude         | dusbradial  |
++------------------------------+-------------+
+|Plasma density                | dssdenest   |
++------------------------------+-------------+
+|Radiated Power Core           | bol_l15     |
++------------------------------+-------------+
+|Radiated Power Edge           | bol_l03     |
++------------------------------+-------------+
+|Radiated Power                | n/a         |
++------------------------------+-------------+
+|Input Power (beam for d3d)    | pinj        |
++------------------------------+-------------+
+|Input Beam Torque             | tinj        |
++------------------------------+-------------+
+|stored energy time derivative | n/a         |
++------------------------------+-------------+
+|plasma current direction      |             |
++------------------------------+-------------+
+|plasma current target         | ipsiptargt  |
++------------------------------+-------------+
+|plasma current error          | ipeecoil    |
++------------------------------+-------------+
+|Electron temperature profile  |             |
++------------------------------+-------------+
+|Electron density profile      |             |
++------------------------------+-------------+
