@@ -1,0 +1,16 @@
+---
+# A list of dummy signals used for unit tests
+
+dummy1:
+  Machine: Dummy
+  Description: Dummy signal
+  LocalPath: dummy1
+  ndim: 0
+  Channels: 1
+
+dummy2:
+  Machine: Dummy
+  Description: Another dummy signal
+  LocalPath: dummy2
+  ndim: 0
+  Channels: 1

@@ -98,22 +98,30 @@ class shot_dataset_disk(Dataset):
                     logging.error(f"Signal not downloaded: {err}")
                     if self.download:
                         logging.info(f"Downloading signal {signal}")
-                        tb, _, signal_data, _, _, _ = self.fetcher.fetch(signal.info, self.shotnr                        )
+                        tb, _, signal_data, _, _, _ = self.fetcher.fetch(
+                            signal.info, self.shotnr
+                        )
                         self.backend_file.store(
                             signal.info, self.shotnr, tb, signal_data
                         )
                     else:
                         raise err
 
-                logging.info(f"Loaded signal {signal}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}")
+                logging.info(
+                    f"Loaded signal {signal}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}"
+                )
 
                 # 2nd step: Re-sample
                 tb_rs, signal_data_rs = resampler(tb, signal_data)
-                logging.info(f"Resampled signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}")
+                logging.info(
+                    f"Resampled signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
+                )
                 # 3rd step: Transform
                 if transform is not None:
                     signal_data_rs = self.transform(signal_data_rs)
-                logging.info(f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}")
+                logging.info(
+                    f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
+                )
 
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_trf.create_group(signal.info["LocalPath"] + "_trf")
@@ -124,10 +132,8 @@ class shot_dataset_disk(Dataset):
                 dset = grp.create_dataset("timebase", tb_rs.shape, dtype="f")
                 dset[:] = tb_rs[:]
 
-
     def __len__(self):
         return len(self.resampler)
-
 
     def __getitem__(self, idx):
         """Fetches a single sample.
@@ -135,7 +141,7 @@ class shot_dataset_disk(Dataset):
         Note: Performance could be improved by implementing slicing directly here:
         https://discuss.pytorch.org/t/dataloader-sample-by-slices-from-dataset/113005/5
         """
-        if torch.is_tensor(idx):
+        if isinstance(idx, torch.Tensor):
             print("idx is a tensor")
             # Sorted indices
             sort_idx = torch.argsort(idx)
@@ -145,13 +151,47 @@ class shot_dataset_disk(Dataset):
             sort_idx2 = torch.argsort(sort_idx)
             idx_orig = idx[sort_idx[sort_idx2]]
 
-            assert(all(idx_orig == idx))
+            assert all(idx_orig == idx)
+
+            idx = idx.tolist()
+            idx_sorted = idx_sorted.tolist()
+
+            # Number of elements to fetch
+
+            print(idx_sorted)
+            num_ele = len(idx)
+        elif isinstance(idx, list):
+            # Assume that idx is a list if indices
+            # This code is the same as when idx is a torch.Tensor.
+            # Sorted indices
+            idx = torch.tensor(idx)
+            sort_idx = torch.argsort(idx)
+            idx_sorted = idx[sort_idx]
+
+            # Using the argsort trick to get the original indices
+            sort_idx2 = torch.argsort(sort_idx)
+            idx_orig = idx[sort_idx[sort_idx2]]
+
+            assert all(idx_orig == idx)
 
             idx = idx.tolist()
             idx_sorted = idx_sorted.tolist()
 
             # Number of elements to fetch
             num_ele = len(idx)
+
+        elif isinstance(idx, slice):
+            # This is kind of a hack. 
+            # When we pass a slice object as the index we
+            # - Pass the slice for indexing the dataset. Assume that the slice is compatible with
+            #   h5py's slicing https://docs.h5py.org/en/stable/high/dataset.html?highlight=slice#fancy-indexing
+            # - We still need to calculate num_ele. In general, a slice can not define a length.
+            #   Instead, the length of a slice is defined only with the array the slice is used to address.
+            #   Use information from the time-base resampler as a proxy of the data length to calcultae
+            #   num_ele here
+            tb_dummy = torch.arange(self.resampler.t_start, self.resampler.t_end, self.resampler.dt, dtype=self.dtype)
+            num_ele = tb_dummy[idx].shape[0]
+
         else:
             num_ele = 1
 
@@ -180,7 +220,9 @@ class shot_dataset_disk(Dataset):
             for pred in self.predictors:
                 if isinstance(idx, list):
                     tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx_sorted]
-                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][idx_sorted, :]
+                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][
+                        idx_sorted, :
+                    ]
                 else:
                     tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx]
                     data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][idx, :]
@@ -188,37 +230,35 @@ class shot_dataset_disk(Dataset):
                 # Access pattern for 0d signals
                 if isinstance(pred, signal_0d):
                     if isinstance(idx, list):
-                        output[:, current_ch:current_ch + pred.num_channels] = torch.tensor(data[sort_idx2.tolist(), :])
+                        output[
+                            :, current_ch : current_ch + pred.num_channels
+                        ] = torch.tensor(data[sort_idx2.tolist(), :])
+                    elif isinstance(idx, slice):
+                        output[:, current_ch : current_ch + pred.num_channels] = torch.tensor(data)
                     else:
-                        output[0, current_ch:current_ch + pred.num_channels] = float(data)
+                        output[0, current_ch : current_ch + pred.num_channels] = float(
+                            data
+                        )
                 else:
                     # TODO: Implement me
                     raise NotImplementedError("Access for 1D data not implemented yet")
 
                 current_ch += pred.num_channels
-        
+
         return output
 
     def __iter__(self):
         """Iterator"""
         return self
-    
+
     def __next__(self):
         """Implement iterable capability"""
         if self._current_index < self.__len__():
             rval = self.__getitem__(self._current_index)
             self._current_index += 1
             return rval
-        
+
         raise StopIteration
-
-
-
-
-
-
-
-
 
 
 # end of file frnn_dataset_disk.py
