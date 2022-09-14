@@ -5,6 +5,7 @@
 import logging
 import tempfile
 from os.path import join
+from os import remove
 
 import h5py
 import torch
@@ -69,7 +70,7 @@ class shot_dataset_disk(Dataset):
             assert self.fetcher is not None
 
         # Create a temporary file name for HDF5 storage.
-        # Note that this is not the original data file.
+        # Note that this is not the data file that contains the signal data for a given shot.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
         with h5py.File(self.tmp_fname, "a") as fp:
             # In the data-loading stage data will be signal by signal. The transformed and
@@ -116,12 +117,12 @@ class shot_dataset_disk(Dataset):
                 logging.info(
                     f"Resampled signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
                 )
-                # 3rd step: Transform
-                if transform is not None:
-                    signal_data_rs = self.transform(signal_data_rs)
-                logging.info(
-                    f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
-                )
+                # # 3rd step: Transform
+                # if transform is not None:
+                #     signal_data_rs = self.transform(signal_data_rs)
+                # logging.info(
+                #     f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
+                # )
 
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_trf.create_group(signal.info["LocalPath"] + "_trf")
@@ -131,6 +132,14 @@ class shot_dataset_disk(Dataset):
                 dset[:] = signal_data_rs[:]
                 dset = grp.create_dataset("timebase", tb_rs.shape, dtype="f")
                 dset[:] = tb_rs[:]
+
+    def delete_data_file(self):
+        """Deletes the temporary datafile.
+        
+        This removes all remnants of this object that the garbage collector would not pick up.
+        """
+        remove(self.tmp_fname)
+
 
     def __len__(self):
         return len(self.resampler)
@@ -196,8 +205,10 @@ class shot_dataset_disk(Dataset):
                 dtype=self.dtype,
             )
             num_ele = tb_dummy[idx].shape[0]
+            idx_sorted = idx
 
         else:
+            idx_sorted = idx
             num_ele = 1
 
         # HDF5 requires sorted indices for access. Argsorting twice can reverse one argsort:
@@ -223,34 +234,29 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                if isinstance(idx, list):
-                    tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx_sorted]
-                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][
-                        idx_sorted, :
-                    ]
-                else:
-                    tb = fp[f"/transformed/{pred.tag}_trf"]["timebase"][idx]
-                    data = fp[f"/transformed/{pred.tag}_trf"]["signal_data"][idx, :]
+                tb = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["timebase"][idx_sorted]
+                data = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["signal_data"][
+                    idx_sorted, :
+                ]
 
                 # Access pattern for 0d signals
-                if isinstance(pred, signal_0d):
-                    if isinstance(idx, list):
-                        output[
-                            :, current_ch : current_ch + pred.num_channels
-                        ] = torch.tensor(data[sort_idx2.tolist(), :])
-                    elif isinstance(idx, slice):
-                        output[
-                            :, current_ch : current_ch + pred.num_channels
-                        ] = torch.tensor(data)
-                    else:
-                        output[0, current_ch : current_ch + pred.num_channels] = float(
-                            data
-                        )
+                if isinstance(idx, list):
+                    output[
+                        :, current_ch : current_ch + pred.num_channels
+                    ] = torch.tensor(data[sort_idx2.tolist(), :])
+                elif isinstance(idx, slice):
+                    output[
+                        :, current_ch : current_ch + pred.num_channels
+                    ] = torch.tensor(data)
                 else:
-                    # TODO: Implement me
-                    raise NotImplementedError("Access for 1D data not implemented yet")
+                    output[0, current_ch : current_ch + pred.num_channels] = float(
+                        data
+                    )
 
                 current_ch += pred.num_channels
+
+        if self.transform:
+            output = self.transform(output)
 
         return output
 

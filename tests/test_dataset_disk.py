@@ -108,8 +108,5 @@ class test_disk_dataset(unittest.TestCase):
         assert((ds_dummy[idx] == data_comp[idx]).all())
 
 
-
-
-
 if __name__ == "__main__":
     unittest.main()

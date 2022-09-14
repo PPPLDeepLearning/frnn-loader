@@ -1,0 +1,18 @@
+---
+d3d_100:
+  shotlist_clear: "d3d_clear_100.txt"
+  shotlist_disrupt: "d3d_disrupt_100.txt"
+  predictor_list: 
+    - q95
+    - efsli
+    - ipspr15V
+    - efsbetan
+    - efswmhd
+    - dusbradial
+    - dssdenest
+    - pradcore
+    - pradedge
+    - bmspinj
+    - bmstinj
+    - ipsiptarget
+    - ipeecoil

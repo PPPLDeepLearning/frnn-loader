@@ -14,7 +14,7 @@
 # Channels: number of channels. 1 for 0d data. number for profiles.
 
 
-dens:
+dssdenest:
   Machine: D3D
   Description: Plasma Density
   PTData: dssdenest
@@ -49,7 +49,7 @@ qmin:
   ndim: 0
   Channels: 1
 
-li:
+efsli:
   Machine: D3D
   Description: Internal inductance
   PTData: efsli
@@ -57,7 +57,7 @@ li:
   ndim: 0
   Channels: 1
 
-ip:
+ipspr15V:
   Machine: D3D
   Description: Plasma Current
   PTData: ipspr15V
@@ -65,7 +65,7 @@ ip:
   ndim: 0
   Channels: 1
 
-betan:
+efsbetan:
   Machine: D3D
   Description: Normalized beta
   PTData: efsbetan
@@ -73,7 +73,7 @@ betan:
   ndim: 0
   Channels: 1
 
-energy:
+efswmhd:
   Machine: D3D
   Description: Stored Energy
   PTData: efswmhd
@@ -81,7 +81,7 @@ energy:
   ndim: 0
   Channels: 1
 
-lm:
+dusbradial:
   Machine: D3D
   Description: Locked Mode Amplitude
   PTData: dusbradial
@@ -139,7 +139,7 @@ iptdirect:
   ndim: 0
   Channels: 1
 
-iptarget:
+ipsiptargt:
   Machine: D3D
   Description: Plasma current target
   PTData: ipsiptargt
@@ -147,14 +147,13 @@ iptarget:
   ndim: 0
   Channels: 1
 
-iperr:
+ipeecoil:
   Machine: D3D
   Description: Plasma current error
   PTData: ipeecoil
-  LocalPat: ipeecoil
+  LocalPath: ipeecoil
   ndim: 0
   Channels: 1
-
 
 tmamp1:
   Machine: D3D
