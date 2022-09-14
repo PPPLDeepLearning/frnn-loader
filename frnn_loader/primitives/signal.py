@@ -106,11 +106,7 @@ class signal_0d(signal_base):
 
     """
 
-    def __init__(
-        self,
-        tag,
-        sig_def_fname="d3d_signals.yaml"
-    ):
+    def __init__(self, tag, sig_def_fname="d3d_signals.yaml"):
         super().__init__(tag, sig_def_fname)
         self.num_channels = 1
         # I'm skipping several parameters from the original definition here.

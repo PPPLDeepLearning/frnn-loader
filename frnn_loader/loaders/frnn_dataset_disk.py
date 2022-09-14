@@ -181,7 +181,7 @@ class shot_dataset_disk(Dataset):
             num_ele = len(idx)
 
         elif isinstance(idx, slice):
-            # This is kind of a hack. 
+            # This is kind of a hack.
             # When we pass a slice object as the index we
             # - Pass the slice for indexing the dataset. Assume that the slice is compatible with
             #   h5py's slicing https://docs.h5py.org/en/stable/high/dataset.html?highlight=slice#fancy-indexing
@@ -189,7 +189,12 @@ class shot_dataset_disk(Dataset):
             #   Instead, the length of a slice is defined only with the array the slice is used to address.
             #   Use information from the time-base resampler as a proxy of the data length to calcultae
             #   num_ele here
-            tb_dummy = torch.arange(self.resampler.t_start, self.resampler.t_end, self.resampler.dt, dtype=self.dtype)
+            tb_dummy = torch.arange(
+                self.resampler.t_start,
+                self.resampler.t_end,
+                self.resampler.dt,
+                dtype=self.dtype,
+            )
             num_ele = tb_dummy[idx].shape[0]
 
         else:
@@ -234,7 +239,9 @@ class shot_dataset_disk(Dataset):
                             :, current_ch : current_ch + pred.num_channels
                         ] = torch.tensor(data[sort_idx2.tolist(), :])
                     elif isinstance(idx, slice):
-                        output[:, current_ch : current_ch + pred.num_channels] = torch.tensor(data)
+                        output[
+                            :, current_ch : current_ch + pred.num_channels
+                        ] = torch.tensor(data)
                     else:
                         output[0, current_ch : current_ch + pred.num_channels] = float(
                             data

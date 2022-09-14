@@ -7,9 +7,10 @@ import torch
 
 from frnn_loader.backends.backend import backend
 
+
 class backend_dummy(backend):
     """Backend that provides dummy data
-    
+
     Args
         root - ignored
         dtype (torch.dtype, default to torch.float32) : Datatype to use.
@@ -20,10 +21,10 @@ class backend_dummy(backend):
 
     def load(self, sig_info, shotnr):
         """Loads data.
-        
+
         Args
             sig_info (string): Signal info
-            shotnr (int): shot number    
+            shotnr (int): shot number
         """
 
         tb = torch.arange(0.0, 1000.0, 1.0)
@@ -33,6 +34,6 @@ class backend_dummy(backend):
 
     def store(self, sig_info, shotnr, tb, signal_data):
         """Store a signal.
-        
+
         This will do nothing"""
         pass
