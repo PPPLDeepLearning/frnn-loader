@@ -8,7 +8,8 @@ import torch
 import numpy as np
 import multiprocessing as mp
 
-class mean_std_normalizer():
+
+class mean_std_normalizer:
     def __init__(self):
         self.mean = None
         self.var = None
@@ -22,6 +23,7 @@ class mean_std_normalizer():
         Args
             ds_list - List of datasets
         """
+
         def calc_mean_single(ds_data, done_q):
             # Calculates the mean channel-wise for a single shot
             result = np.array(ds_data.mean(axis=0))
@@ -29,7 +31,7 @@ class mean_std_normalizer():
 
         def calc_var_single(ds_data, mean_all, done_q):
             # Calculate E[(X - E[X])^2] channel-wise for a single shot
-            result = np.array(((ds_data - mean_all)**2.0).mean(axis=0))
+            result = np.array(((ds_data - mean_all) ** 2.0).mean(axis=0))
             done_q.put(result)
 
         # Instantiate a queue. A group of worker threads executes calc_mean_single

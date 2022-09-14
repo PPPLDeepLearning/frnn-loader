@@ -135,11 +135,10 @@ class shot_dataset_disk(Dataset):
 
     def delete_data_file(self):
         """Deletes the temporary datafile.
-        
+
         This removes all remnants of this object that the garbage collector would not pick up.
         """
         remove(self.tmp_fname)
-
 
     def __len__(self):
         return len(self.resampler)
@@ -234,7 +233,9 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                tb = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["timebase"][idx_sorted]
+                tb = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["timebase"][
+                    idx_sorted
+                ]
                 data = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["signal_data"][
                     idx_sorted, :
                 ]
@@ -249,9 +250,7 @@ class shot_dataset_disk(Dataset):
                         :, current_ch : current_ch + pred.num_channels
                     ] = torch.tensor(data)
                 else:
-                    output[0, current_ch : current_ch + pred.num_channels] = float(
-                        data
-                    )
+                    output[0, current_ch : current_ch + pred.num_channels] = float(data)
 
                 current_ch += pred.num_channels
 

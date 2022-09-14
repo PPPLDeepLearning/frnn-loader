@@ -12,8 +12,9 @@ and end in a shot when a certain condition is fulfilled.
 """
 
 
-class filter_ip_thresh():
+class filter_ip_thresh:
     """A filter based on plasma current"""
+
     def __init__(self, ip_thresh=0.2):
         self.ip_thresh = ip_thresh
 
@@ -37,5 +38,6 @@ class filter_ip_thresh():
 
     def __str__(self):
         return f"filter_ip_thresh - self.ip_thresh={self.ip_thresh}"
+
 
 # end of file filters.py

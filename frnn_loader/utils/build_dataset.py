@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+
 sys.path.append("/home/rkube/repos/frnn-loader")
 
 from os.path import join
@@ -8,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-import torch 
+import torch
 
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
 from frnn_loader.backends.backend_hdf5 import backend_hdf5
@@ -17,7 +18,6 @@ from frnn_loader.primitives.resamplers import resampler_causal
 from frnn_loader.primitives.signal import signal_0d
 from frnn_loader.primitives.normalizers import mean_std_normalizer
 from frnn_loader.loaders.frnn_dataset_disk import shot_dataset_disk
-
 
 
 """Construct a dataset for FRNN training.
@@ -42,9 +42,21 @@ etc.
 proj_dir = "/projects/FRNN/frnn_loader"
 
 # 1/ Describe the dataset
-predictor_tags = ["q95", "efsli", "ipspr15V", "efsbetan", "efswmhd", "dusbradial",
-                  "dssdenest", "pradcore", "pradedge", "bmspinj", "bmstinj", "ipsiptargt",
-                  "ipeecoil"]
+predictor_tags = [
+    "q95",
+    "efsli",
+    "ipspr15V",
+    "efsbetan",
+    "efswmhd",
+    "dusbradial",
+    "dssdenest",
+    "pradcore",
+    "pradedge",
+    "bmspinj",
+    "bmstinj",
+    "ipsiptargt",
+    "ipeecoil",
+]
 predictor_list = [signal_0d(tag) for tag in predictor_tags]
 
 # Contains a list of shots that are non-disruptive
@@ -60,7 +72,6 @@ my_backend = backend_hdf5(proj_dir)
 my_fetcher = fetcher_d3d_v1()
 
 
-
 num_shots = 5
 shotdict = {}
 
@@ -73,7 +84,16 @@ with open(join(proj_dir, "..", "shot_lists", shotlist_clear), "r") as fp:
         # Run the Ip filter over the current shot
         tb, data = my_backend.load(signal_ip.info, shotnr)
         tmin, tmax = ip_filter(tb, data)
-        shotdict.update({shotnr: {"tmin": tmin, "tmax": tmax, "is_disruptive": False, "t_disrupt": -1.0}})
+        shotdict.update(
+            {
+                shotnr: {
+                    "tmin": tmin,
+                    "tmax": tmax,
+                    "is_disruptive": False,
+                    "t_disrupt": -1.0,
+                }
+            }
+        )
 
         i += 1
         if i >= num_shots:
@@ -86,7 +106,16 @@ with open(join(proj_dir, "..", "shot_lists", shotlist_disrupt), "r") as fp:
         shotnr, ttd = [trf(val) for trf, val in zip([int, float], line.split())]
         # ttd is given in seconds in the text files. Convert it to milliseconds
         ttd = ttd * 1e3
-        shotdict.update({shotnr: {"tmin": tmin, "tmax": ttd, "is_disruptive": True, "t_disrupt": ttd}})
+        shotdict.update(
+            {
+                shotnr: {
+                    "tmin": tmin,
+                    "tmax": ttd,
+                    "is_disruptive": True,
+                    "t_disrupt": ttd,
+                }
+            }
+        )
 
         i += 1
         if i >= num_shots:
@@ -108,14 +137,16 @@ for shotnr in shotdict.keys():
     # Resample all signals over the valid intervals
     my_resampler = resampler_causal(0.0, shotdict[shotnr]["tmax"], 1.0)
 
-    ds = shot_dataset_disk(shotnr, 
-                           predictors=predictor_list, 
-                           resampler=my_resampler, 
-                           backend_file=my_backend, 
-                           fetcher=my_fetcher, 
-                           root=proj_dir,
-                           download=True,
-                           dtype=torch.float32)
+    ds = shot_dataset_disk(
+        shotnr,
+        predictors=predictor_list,
+        resampler=my_resampler,
+        backend_file=my_backend,
+        fetcher=my_fetcher,
+        root=proj_dir,
+        download=True,
+        dtype=torch.float32,
+    )
 
     dset_list.append(ds)
 
@@ -134,8 +165,6 @@ for ds in dset_list:
     ds.transform = my_normalizer
 
     print(ds[:].shape, ds[:].mean(axis=0), ds[:].std(axis=0))
-
-
 
 
 # end of file build_dataset.py
