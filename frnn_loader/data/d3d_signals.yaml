@@ -93,7 +93,8 @@ echpwrc:
   Machine: D3D
   Description: Total EC power injected into DIII-D
   MDSTree: D3D
-  MDSPATH: RF.ECH.TOTAL:ECHPWRC
+  MDSPath: RF.ECH.TOTAL:ECHPWRC
+  LocalPath: echpwrc
   ndim: 0
   Channels: 1
 

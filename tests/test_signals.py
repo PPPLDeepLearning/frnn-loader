@@ -27,7 +27,7 @@ class TestSignals(unittest.TestCase):
         try:
             cls.tmpdir = environ["TMPDIR"]
         except KeyError:
-            cls.tmpdir = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+            cls.tmpdir = tempfile.mkdtemp(dir="/tmp/")
         cls.shotnr = 180619
 
     @classmethod
@@ -44,9 +44,9 @@ class TestSignals(unittest.TestCase):
 
     def test_signals_0d(self):
         """Compare downloaded signal shape to data read from backend."""
-        sig_names = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
-                     "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
-                     "iptdirect", "iptarget",
+        sig_names = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                     "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "ipsiptargt", "ipeecoil",
                      "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
         my_backend = backend_txt(self.tmpdir)

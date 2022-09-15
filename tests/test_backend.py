@@ -34,9 +34,9 @@ class test_backends(unittest.TestCase):
         except KeyError:
             cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
         cls.shotnr = 180619
-        cls.signal_list = ["dens", "fs07", "q95", "qmin", "li", "ip", "betan",
-                     "energy", "lm", "pradcore", "pradedge", "bmspinj", "bmstinj",
-                     "iptdirect", "iptarget",
+        cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                     "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "ipsiptargt", "ipeecoil",
                      "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
     

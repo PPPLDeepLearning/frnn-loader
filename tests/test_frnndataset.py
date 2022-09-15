@@ -3,6 +3,10 @@
 # python -m unittest tests/test_frnndataset.py
 import unittest
 import torch
+import shutil
+import tempfile
+import errno
+from os import environ
 
 
 import logging
@@ -20,6 +24,37 @@ logging.basicConfig(format=FORMAT,level=logging.DEBUG)
 class test_frnn_dataset(unittest.TestCase):
     """Test routines working with the frnn dataset."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up unit tests for disk dataset.
+        
+        * Create a temporary directory
+        """
+        try:
+            cls.root = environ["TMPDIR"]
+        except KeyError:
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+    
+        cls.shotnr = 180619
+        cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                     "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "ipsiptargt", "ipeecoil",
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
+
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down unit backend tests.
+        
+        * Delete temp directory.
+        """
+        try:
+            shutil.rmtree(cls.root)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception
+
+
     def test_frnn_dataset(self):
         """Test instantiation of the dataset."""
         # Instantiate a resampler
@@ -29,10 +64,15 @@ class test_frnn_dataset(unittest.TestCase):
         my_backend_file = backend_txt("/home/rkube/datasets/frnn/signal_data_new_2021/")
         my_fetcher = fetcher_d3d_v1()
 
-        signal_fs07 = signal_0d("fs07")
-        signal_q95 = signal_0d("q95")
 
-        ds = shot_dataset(184800, [signal_fs07, signal_q95], 
+        signal_names = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                        "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", 
+                        "bmstinj", "iptdirect", "ipsiptargt", "ipeecoil",
+                        "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
+
+        pred_list = [signal_0d(n) for n in signal_names]
+
+        ds = shot_dataset(184800, pred_list,
                           resampler=my_resampler, backend_file=my_backend_file, 
                           backend_fetcher=my_fetcher, download=True,
                           dtype=torch.float32)

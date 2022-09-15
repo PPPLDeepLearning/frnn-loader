@@ -28,7 +28,10 @@ class test_fetch_d3d(unittest.TestCase):
         * Define signals to use
         """
         cls.shotnr = 180619
-        cls.signal_list = ["fs07", "q95"]
+        cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                     "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "ipsiptargt", "ipeecoil",
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
     """Try fetching from D3D - atlas.gat.com"""
     def test_fetch_d3d(self):

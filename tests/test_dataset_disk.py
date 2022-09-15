@@ -4,6 +4,9 @@
 import unittest
 import tempfile
 import logging
+import shutil
+import errno
+from os import environ
 
 import torch
 import numpy as np
@@ -28,9 +31,16 @@ class test_disk_dataset(unittest.TestCase):
         
         * Create a temporary directory
         """
-        cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp")
+        try:
+            cls.root = environ["TMPDIR"]
+        except KeyError:
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+    
         cls.shotnr = 180619
-        cls.signal_list = ["fs07", "q95"]
+        cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
+                     "efswmhd", "dusbradial", "echpwrc", "pradcore", "pradedge", "bmspinj", "bmstinj",
+                     "iptdirect", "ipsiptargt", "ipeecoil",
+                     "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
     @classmethod
     def tearDownClass(cls):
@@ -38,11 +48,11 @@ class test_disk_dataset(unittest.TestCase):
         
         * Delete temp directory.
         """
-        # try:
-        #     shutil.rmtree(cls.root)  # delete directory
-        # except OSError as exc:
-        #     if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
-        #         raise  # re-raise exception
+        try:
+            shutil.rmtree(cls.root)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception
 
     def test_frnn_dataset(self):
         """Test instantiation of the dataset."""
