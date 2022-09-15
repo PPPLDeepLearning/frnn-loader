@@ -60,15 +60,15 @@ class test_disk_dataset(unittest.TestCase):
         my_resampler = resampler_causal(0.0, 2e3, 1e0)
 
         # Instantiate a file backend
-        my_backend_file = backend_hdf5("/home/rkube/datasets/frnn/")
+        my_backend_file = backend_hdf5(self.root)
         my_fetcher = fetcher_d3d_v1()
         root = self.root
 
-        signal_fs07 = signal_0d("fs07")
-        signal_q95 = signal_0d("q95")
+        pred_list = [signal_0d(n) for n in self.signal_list]
 
+        
         ds = shot_dataset_disk(self.shotnr, 
-                               predictors=[signal_fs07, signal_q95], 
+                               predictors=pred_list, 
                                resampler=my_resampler, 
                                backend_file=my_backend_file, 
                                fetcher=my_fetcher, 
