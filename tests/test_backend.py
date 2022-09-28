@@ -37,7 +37,7 @@ class test_backends(unittest.TestCase):
 
         # Set up a directory within the tempdir
         cls.root = join(tempdir, f"{next(tempfile._get_candidate_names())}")
-        if os.path.exists(cls.root) == False:
+        if exists(cls.root) == False:
             mkdir(cls.root)
 
         
