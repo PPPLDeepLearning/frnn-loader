@@ -23,6 +23,7 @@ d3d_disrupt_100.txt
 
 """
 
+from os import environ
 from os.path import join
 import unittest
 import tempfile
@@ -49,7 +50,11 @@ class test_transform_d3d_test100(unittest.TestCase):
         - Defines signals to use
         """
 
-        cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp")
+        try:
+            cls.root = tempfile.mkdtemp(dir=environ["TMPDIR"])
+        except KeyError:
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+
         cls.basedir = "/projects/FRNN/shot_lists"
         cls.shotlist_clear = []
         with open(join(cls.basedir, "d3d_clear_100.txt"), "r") as fp:

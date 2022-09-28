@@ -32,7 +32,7 @@ class test_frnn_dataset(unittest.TestCase):
         * Create a temporary directory
         """
         try:
-            cls.root = environ["TMPDIR"]
+            cls.root = tempfile.mkdtemp(environ["TMPDIR"])
         except KeyError:
             cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
     

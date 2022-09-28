@@ -6,8 +6,7 @@ import logging
 import tempfile
 import shutil
 import errno
-from os import environ, mkdir
-from os.path import exists, join
+from os import environ
 
 import torch
 from frnn_loader.backends.backend_txt import backend_txt
@@ -31,15 +30,11 @@ class test_backends(unittest.TestCase):
         * Define a list of signals to use
         """
         try:
-            tempdir = environ["TMPDIR"]
+            cls.root = tempfile.mkdtemp(dir=environ["TMPDIR"])
         except KeyError:
-            tempdir = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
 
         # Set up a directory within the tempdir
-        cls.root = join(tempdir, f"{next(tempfile._get_candidate_names())}")
-        if exists(cls.root) == False:
-            mkdir(cls.root)
-
         
         cls.shotnr = 180619
         cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",

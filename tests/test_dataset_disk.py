@@ -32,10 +32,9 @@ class test_disk_dataset(unittest.TestCase):
         * Create a temporary directory
         """
         try:
-            cls.root = environ["TMPDIR"]
+            cls.root = tempfile.mkdtemp(environ["TMPDIR"])
         except KeyError:
             cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
-        print(f"Using root: ", cls.root)
     
         cls.shotnr = 180619
         cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",

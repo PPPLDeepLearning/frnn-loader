@@ -25,9 +25,11 @@ class TestSignals(unittest.TestCase):
         """
         # The working dir should be empty. Test will fail if not empty.
         try:
-            cls.tmpdir = environ["TMPDIR"]
+            cls.root = tempfile.mkdtemp(dir=environ["TMPDIR"])
         except KeyError:
-            cls.tmpdir = tempfile.mkdtemp(dir="/tmp/")
+            cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+
+        print(f"cls.root = {cls.root}")
         cls.shotnr = 180619
 
     @classmethod
@@ -36,7 +38,7 @@ class TestSignals(unittest.TestCase):
         
         * Remove temp directory."""
         try:
-            shutil.rmtree(cls.tmpdir)  # delete directory
+            shutil.rmtree(cls.root)  # delete directory
         except OSError as exc:
             if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
                 raise  # re-raise exception
@@ -49,7 +51,7 @@ class TestSignals(unittest.TestCase):
                      "iptdirect", "ipsiptargt", "ipeecoil",
                      "tmamp1", "tmamp2", "tmfreq1", "tmfreq2"]
 
-        my_backend = backend_txt(self.tmpdir)
+        my_backend = backend_txt(self.root)
         my_fetcher = fetcher_d3d_v1()
 
         for name in sig_names:
