@@ -69,7 +69,8 @@ class shot_dataset_disk(Dataset):
         if self.download:
             assert self.fetcher is not None
 
-        assert(isdir(self.root))
+        print(f"__init__: root = {self.root}")
+        assert isdir(self.root)
 
         # Create a temporary file name for HDF5 storage.
         # Note that this is not the data file that contains the signal data for a given shot.

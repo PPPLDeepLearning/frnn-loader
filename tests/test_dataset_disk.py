@@ -35,6 +35,7 @@ class test_disk_dataset(unittest.TestCase):
             cls.root = environ["TMPDIR"]
         except KeyError:
             cls.root = tempfile.mkdtemp(dir="/home/rkube/tmp/")
+        print(f"Using root: ", cls.root)
     
         cls.shotnr = 180619
         cls.signal_list = ["dssdenest", "fs07", "q95", "qmin", "efsli", "ipspr15V", "efsbetan",
@@ -62,17 +63,14 @@ class test_disk_dataset(unittest.TestCase):
         # Instantiate a file backend
         my_backend_file = backend_hdf5(self.root)
         my_fetcher = fetcher_d3d_v1()
-        root = self.root
-
         pred_list = [signal_0d(n) for n in self.signal_list]
 
-        
         ds = shot_dataset_disk(self.shotnr, 
                                predictors=pred_list, 
                                resampler=my_resampler, 
                                backend_file=my_backend_file, 
                                fetcher=my_fetcher, 
-                               root = root,
+                               root = self.root,
                                download=True,
                                dtype=torch.float32)
 
