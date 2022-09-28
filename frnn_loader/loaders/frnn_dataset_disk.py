@@ -4,7 +4,7 @@
 
 import logging
 import tempfile
-from os.path import join
+from os.path import join, isdir
 from os import remove
 
 import h5py
@@ -68,6 +68,8 @@ class shot_dataset_disk(Dataset):
         # If we want to download we need to have a fetcher bassed
         if self.download:
             assert self.fetcher is not None
+
+        assert(isdir(self.root))
 
         # Create a temporary file name for HDF5 storage.
         # Note that this is not the data file that contains the signal data for a given shot.
