@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# https://teddykoker.com/2020/12/dataloader/
+
 import sys
 
 sys.path.append("/home/rkube/repos/frnn-loader")
