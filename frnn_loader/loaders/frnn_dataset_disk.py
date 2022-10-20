@@ -144,6 +144,7 @@ class shot_dataset_disk(Dataset):
         remove(self.tmp_fname)
 
     def __len__(self):
+        print(f"---- Dataset length = {len(self.resampler)}")
         return len(self.resampler)
 
     def __getitem__(self, idx):
@@ -152,6 +153,7 @@ class shot_dataset_disk(Dataset):
         Note: Performance could be improved by implementing slicing directly here:
         https://discuss.pytorch.org/t/dataloader-sample-by-slices-from-dataset/113005/5
         """
+        print(f"__getitem__, idx = {idx}")
         if isinstance(idx, torch.Tensor):
             print("idx is a tensor")
             # Sorted indices
@@ -264,10 +266,12 @@ class shot_dataset_disk(Dataset):
 
     def __iter__(self):
         """Iterator"""
+        print("Calling __iter__")
         return self
 
     def __next__(self):
         """Implement iterable capability"""
+        print(f"Calling __next__: _current_index={self._current_index}")
         if self._current_index < self.__len__():
             rval = self.__getitem__(self._current_index)
             self._current_index += 1
