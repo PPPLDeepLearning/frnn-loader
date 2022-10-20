@@ -5,7 +5,8 @@ import logging
 from math import ceil
 import numpy as np
 
-class random_sequence_sampler():
+
+class random_sequence_sampler:
     """Samples random sequences from a list of shot datasets.
 
     A list of shots defines the data in this shot.
@@ -24,11 +25,12 @@ class random_sequence_sampler():
         ds_list (frnn_multi_dataset) : Multi-shot dataset to load data from
         seq_length (int) : Length of sequences
         batch_size (int, default=1) : Batch size
-        drop_last (bool, default=True) : If the set to True to drop the last 
+        drop_last (bool, default=True) : If the set to True to drop the last
             incomplete batch, if the dataset size is not divisible by the batch
             size. If False and the size of dataset is not divisible by the batch
-            size, then the last batch will be smaller. 
+            size, then the last batch will be smaller.
     """
+
     def __init__(self, ds_list, seq_length, batch_size=1, drop_last=True):
         # This is the length of all shots
         self.shot_length = [len(ds) for ds in ds_list]
@@ -45,7 +47,7 @@ class random_sequence_sampler():
     def __iter__(self):
         """Returns a list of shot indices and slices
 
-        The iterator returns a total of 
+        The iterator returns a total of
             sum(self.shot_length) // self.seq_length
         batches
 
@@ -54,13 +56,14 @@ class random_sequence_sampler():
 
         The probabiity that a sample is from shot s is given by
             length(shot[s]) / sum(length(shot[]))
-    
+
         """
         # Number of sequences to draw in order to exhaust this iterator
         num_draws = sum(self.shot_length) // self.seq_length
         # Determine the shots that we get slices from
-        shot_idx = np.random.choice(np.arange(self.num_shots), 
-                                    (num_draws, ), p=self.p_shot)
+        shot_idx = np.random.choice(
+            np.arange(self.num_shots), (num_draws,), p=self.p_shot
+        )
         # Upper index for the sequence to start, adapted to the shot we draw from
         upper_idx = [self.shot_length[s] - self.seq_length for s in shot_idx]
 
@@ -71,26 +74,42 @@ class random_sequence_sampler():
             # When batch_size == 1 return a single index.
             # No collate_fn is needed
             for i in range(num_draws):
-                yield (shot_idx[i], slice(start_idx[i], start_idx[i] + self.seq_length, 1))
+                yield (
+                    shot_idx[i],
+                    slice(start_idx[i], start_idx[i] + self.seq_length, 1),
+                )
 
         else:
             # When using batch_size > 2, draw multiple samples, put them
             # in a list and let collate_fn deal with the rest
             for i in range(0, num_draws // self.batch_size, self.batch_size):
-                yield [(shot_idx[i + b], slice(start_idx[i + b], start_idx[i + b] + self.seq_length, 1)) for b in range(self.batch_size)]
+                yield [
+                    (
+                        shot_idx[i + b],
+                        slice(start_idx[i + b], start_idx[i + b] + self.seq_length, 1),
+                    )
+                    for b in range(self.batch_size)
+                ]
 
             # Handle final samples if drop_last=False
-            if self.drop_last == False and (ceil(num_draws / self.batch_size) > (num_draws // self.batch_size)):
+            if self.drop_last == False and (
+                ceil(num_draws / self.batch_size) > (num_draws // self.batch_size)
+            ):
                 start = num_draws // self.batch_size * self.batch_size
                 stop = num_draws
-                yield [(shot_idx[i], slice(start_idx[i], start_idx[i] + self.seq_length, 1)) for i in range(start, stop)]
-
+                yield [
+                    (
+                        shot_idx[i],
+                        slice(start_idx[i], start_idx[i] + self.seq_length, 1),
+                    )
+                    for i in range(start, stop)
+                ]
 
     def __len__(self) -> int:
         return max(self.shot_length) // self.seq_length
 
 
-class frnn_loader():
+class frnn_loader:
     """Custom loader for FRNN datasets.
 
     PyTorch expects training batches to have shape
@@ -103,7 +122,7 @@ class frnn_loader():
     This loader performs random sampling for a shot_dataset_disk
 
     """
-    
+
     def __init__(self, dataset, batch_size, seq_length, collate_fn=None):
         self.dataset = dataset
         self.batch_size = batch_size
