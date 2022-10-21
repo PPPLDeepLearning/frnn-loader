@@ -60,7 +60,7 @@ class shot_dataset_disk(Dataset):
         self.root = root
         self.download = download
         self.transform = transform
-        self.is_disruptive=is_disruptive
+        self.is_disruptive = is_disruptive
         self.dtype = dtype
         # Pre-calculate the array shape. That is, the sum of the channels over all predictors
         self.sum_all_channels = sum([pred.num_channels for pred in self.predictors])
@@ -74,7 +74,7 @@ class shot_dataset_disk(Dataset):
         assert isdir(self.root)
 
         # Create a temporary file name for HDF5 storage.
-        # Note that this is not the data file that contains the downloaded 
+        # Note that this is not the data file that contains the downloaded
         # signal data for a given shot. It is a new file that stores the transformed
         # data.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
@@ -136,8 +136,8 @@ class shot_dataset_disk(Dataset):
                 # )
 
                 # 4th step: Transform time to time-to-disruption
-                #T_max = conf['data']['T_max']
-                #dt = conf['data']['dt']
+                # T_max = conf['data']['T_max']
+                # dt = conf['data']['dt']
                 if self.is_disruptive:
                     ttd = max(tb_rs) - tb_rs
                     ttd = np.clip(ttd, 0, 10.0)

@@ -31,14 +31,14 @@ class frnn_multi_dataset:
             idx_slice: Tuple(int, slice) - Used to fetch a slice of data
             idx_slice: List(Tuple(int, slice)) - Used for batching.
         """
-        if(isinstance(idx_slice, tuple)):
+        if isinstance(idx_slice, tuple):
             # If idx_slice is a tuple, map the slice directly to the requested dataset
             ds_idx, slice = idx_slice
             return self.ds_list[ds_idx][slice]
-        elif(isinstance(idx_slice, list)):
+        elif isinstance(idx_slice, list):
             # If idx_slice is a list, do the mapping of index and slice individually
             # and return a list.
-            return [self.ds_list[ds_idx][slice] for ds_idx, slice in idx_slice]    
+            return [self.ds_list[ds_idx][slice] for ds_idx, slice in idx_slice]
 
 
 # End of file frnn_multi_dataset.py
