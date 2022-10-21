@@ -6,7 +6,7 @@ from math import ceil
 import numpy as np
 
 
-class random_sequence_sampler:
+class random_sequence_sampler():
     """Samples random sequences from a list of shot datasets.
 
     A list of shots defines the data in this shot.
@@ -36,16 +36,19 @@ class random_sequence_sampler:
         self.shot_length = [len(ds) for ds in ds_list]
         self.num_shots = len(ds_list)
         self.seq_length = seq_length
-        self.batch_size = batch_size
-        self.drop_last = drop_last
+        #self.batch_size = batch_size
+        #self.drop_last = drop_last
 
         # The probability of drawing a sequence from a given shot is
         # given by the shots length relative to the cumulative length of
         # all shots
         self.p_shot = [len(ds) / sum(self.shot_length) for ds in ds_list]
 
+        # Number of draws to exhaust the iterator
+        self.num_draws = sum(self.shot_length) // self.seq_length
+
     def __iter__(self):
-        """Returns a list of shot indices and slices
+        """Returns a tuple of a single shot index and slice
 
         The iterator returns a total of
             sum(self.shot_length) // self.seq_length
@@ -54,35 +57,62 @@ class random_sequence_sampler:
         Each sample has dimension
             (self.batch_size, self.seq_length, shot.sum_all_channels)
 
-        The probabiity that a sample is from shot s is given by
+        The probability that a sample is from shot s is given by
             length(shot[s]) / sum(length(shot[]))
-
-        """
-        # Number of sequences to draw in order to exhaust this iterator
-        num_draws = sum(self.shot_length) // self.seq_length
+        """        
         # Determine the shots that we get slices from
         shot_idx = np.random.choice(
-            np.arange(self.num_shots), (num_draws,), p=self.p_shot
+            np.arange(self.num_shots), (self.num_draws,), p=self.p_shot
         )
         # Upper index for the sequence to start, adapted to the shot we draw from
         upper_idx = [self.shot_length[s] - self.seq_length for s in shot_idx]
-
         # Upper index for the slice
         start_idx = [np.random.randint(0, u) for u in upper_idx]
 
-        if self.batch_size == 1:
-            # When batch_size == 1 return a single index.
-            # No collate_fn is needed
-            for i in range(num_draws):
-                yield (
-                    shot_idx[i],
-                    slice(start_idx[i], start_idx[i] + self.seq_length, 1),
-                )
+        # Return a single index
+        for i in range(self.num_draws):
+            yield (
+                shot_idx[i],
+                slice(start_idx[i], start_idx[i] + self.seq_length, 1),
+            )
 
-        else:
+    def __len__(self) -> int:
+        return max(self.shot_length) // self.seq_length
+
+
+class batched_random_sequence_sampler(random_sequence_sampler):
+    """Random sequence sampler, but with mini-batches"""
+    def __init__(self,  ds_list, seq_length, batch_size=1, drop_last=True):
+        super(batched_random_sequence_sampler, self).__init__(ds_list, seq_length)
+        self.batch_size = batch_size
+        self.drop_last = drop_last
+
+    def __iter__(self):
+            """Returns a list of tuples of shot indices and slices
+
+            The iterator returns a total of
+                sum(self.shot_length) // self.seq_length
+            batches
+
+            Each sample has dimension
+                (self.batch_size, self.seq_length, shot.sum_all_channels)
+
+            The probability that a sample is from shot s is given by
+                length(shot[s]) / sum(length(shot[]))
+            """
+            # Determine the shots that we get slices from
+            shot_idx = np.random.choice(
+                np.arange(self.num_shots), (self.num_draws,), p=self.p_shot
+            )
+            # Upper index for the sequence to start, adapted to the shot we draw from
+            upper_idx = [self.shot_length[s] - self.seq_length for s in shot_idx]
+
+            # Upper index for the slice
+            start_idx = [np.random.randint(0, u) for u in upper_idx]
+
             # When using batch_size > 2, draw multiple samples, put them
             # in a list and let collate_fn deal with the rest
-            for i in range(0, num_draws // self.batch_size, self.batch_size):
+            for i in range(0, self.num_draws // self.batch_size, self.batch_size):
                 yield [
                     (
                         shot_idx[i + b],
@@ -93,10 +123,10 @@ class random_sequence_sampler:
 
             # Handle final samples if drop_last=False
             if self.drop_last == False and (
-                ceil(num_draws / self.batch_size) > (num_draws // self.batch_size)
+                ceil(self.num_draws / self.batch_size) > (self.num_draws // self.batch_size)
             ):
-                start = num_draws // self.batch_size * self.batch_size
-                stop = num_draws
+                start = self.num_draws // self.batch_size * self.batch_size
+                stop = self.num_draws
                 yield [
                     (
                         shot_idx[i],
@@ -104,9 +134,6 @@ class random_sequence_sampler:
                     )
                     for i in range(start, stop)
                 ]
-
-    def __len__(self) -> int:
-        return max(self.shot_length) // self.seq_length
 
 
 class frnn_loader:
@@ -122,7 +149,6 @@ class frnn_loader:
     This loader performs random sampling for a shot_dataset_disk
 
     """
-
     def __init__(self, dataset, batch_size, seq_length, collate_fn=None):
         self.dataset = dataset
         self.batch_size = batch_size

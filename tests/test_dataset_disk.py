@@ -99,20 +99,20 @@ class test_disk_dataset(unittest.TestCase):
 
         # Test individual element access
         for idx in np.random.randint(0, 1000, 100):
-            assert((ds_dummy[idx] == data_comp[idx]).all())
+            assert((ds_dummy[idx][0] == data_comp[idx]).all())
 
         # Test slicing
-        assert((ds_dummy[:] == data_comp[:]).all())
-        assert((ds_dummy[1:] == data_comp[1:]).all())
-        assert((ds_dummy[3:-9] == data_comp[3:-9]).all())
-        assert((ds_dummy[1:44:2] == data_comp[1:44:2]).all())
+        assert((ds_dummy[:][0] == data_comp[:]).all())
+        assert((ds_dummy[1:][0] == data_comp[1:]).all())
+        assert((ds_dummy[3:-9][0] == data_comp[3:-9]).all())
+        assert((ds_dummy[1:44:2][0] == data_comp[1:44:2]).all())
         
         # Test indexing using index tuples / listst
         idx = torch.randperm(1000)[:100]
-        assert((ds_dummy[idx] == data_comp[idx]).all())
+        assert((ds_dummy[idx][0] == data_comp[idx]).all())
 
         idx = list(torch.randperm(1000)[:100])
-        assert((ds_dummy[idx] == data_comp[idx]).all())
+        assert((ds_dummy[idx][0] == data_comp[idx]).all())
 
 
 if __name__ == "__main__":

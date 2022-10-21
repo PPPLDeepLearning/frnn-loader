@@ -65,6 +65,7 @@ unit-test-job:   # This job runs in the test stage.
     - python3 -m unittest tests/test_backend.py
     - python3 -m unittest tests/test_dataset_disk.py
     - python3 -m unittest tests/test_frnndataset.py
+    - python3 -m unittest tests/test_dataloader.py
     - echo "Code coverage is 90%"
 
 lint-test-job:   # This job also runs in the test stage.

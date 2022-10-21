@@ -7,6 +7,7 @@ import tempfile
 from os.path import join, isdir
 from os import remove
 
+import numpy as np
 import h5py
 import torch
 from torch.utils.data import Dataset
@@ -47,6 +48,7 @@ class shot_dataset_disk(Dataset):
         root,
         download=False,
         transform=None,
+        is_disruptive=False,
         dtype=torch.float32,
     ):
         """Initializes the disk dataset."""
@@ -58,6 +60,7 @@ class shot_dataset_disk(Dataset):
         self.root = root
         self.download = download
         self.transform = transform
+        self.is_disruptive=is_disruptive
         self.dtype = dtype
         # Pre-calculate the array shape. That is, the sum of the channels over all predictors
         self.sum_all_channels = sum([pred.num_channels for pred in self.predictors])
@@ -68,12 +71,12 @@ class shot_dataset_disk(Dataset):
         # If we want to download we need to have a fetcher bassed
         if self.download:
             assert self.fetcher is not None
-
-        print(f"__init__: root = {self.root}")
         assert isdir(self.root)
 
         # Create a temporary file name for HDF5 storage.
-        # Note that this is not the data file that contains the signal data for a given shot.
+        # Note that this is not the data file that contains the downloaded 
+        # signal data for a given shot. It is a new file that stores the transformed
+        # data.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
         with h5py.File(self.tmp_fname, "a") as fp:
             # In the data-loading stage data will be signal by signal. The transformed and
@@ -81,10 +84,15 @@ class shot_dataset_disk(Dataset):
             h5_grp_trf = fp.create_group("transformed")
             h5_grp_trf.attrs["shotnr"] = self.shotnr
 
+            tmp = np.random.randn(100)
+
+            # ds_tmp = h5_grp_trf.create_dataset("tmp", tmp.shape, dtype="f")
+            # ds_tmp[:] = tmp[:]
+
             # Next is pre-processing. We attack it like this
-            # 1. Fetch the signals
+            # 1. Fetch the signals from either HDF5 or MDS
             # 2. Re-sampled the signals
-            # 3. Apply the transformation
+            # 3. Apply transformation to signal data and transform timebase to time-to-disruption (ttd)
             # 4. Store the data in a hdf5 file.
 
             invalid_signals = 0  # Count number of invalid signals
@@ -127,14 +135,28 @@ class shot_dataset_disk(Dataset):
                 #     f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
                 # )
 
+                # 4th step: Transform time to time-to-disruption
+                #T_max = conf['data']['T_max']
+                #dt = conf['data']['dt']
+                if self.is_disruptive:
+                    ttd = max(tb_rs) - tb_rs
+                    ttd = np.clip(ttd, 0, 10.0)
+                else:
+                    ttd = 10.0 * np.ones_like(tb_rs)
+                    #
+                    ttd = np.log10(ttd + 0.1 * resampler.dt)
+
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_trf.create_group(signal.info["LocalPath"] + "_trf")
                 dset = grp.create_dataset(
                     "signal_data", signal_data_rs.shape, dtype="f"
                 )
                 dset[:] = signal_data_rs[:]
-                dset = grp.create_dataset("timebase", tb_rs.shape, dtype="f")
-                dset[:] = tb_rs[:]
+            print("tb_rs.shape = ", tb_rs.shape)
+            dset = h5_grp_trf.create_dataset("tb", tb_rs.shape, dtype="f")
+            dset[:] = tb_rs[:]
+            dset = h5_grp_trf.create_dataset("ttd", ttd.shape, dtype="f")
+            dset[:] = ttd[:]
 
     def delete_data_file(self):
         """Deletes the temporary datafile.
@@ -144,7 +166,6 @@ class shot_dataset_disk(Dataset):
         remove(self.tmp_fname)
 
     def __len__(self):
-        print(f"---- Dataset length = {len(self.resampler)}")
         return len(self.resampler)
 
     def __getitem__(self, idx):
@@ -153,7 +174,6 @@ class shot_dataset_disk(Dataset):
         Note: Performance could be improved by implementing slicing directly here:
         https://discuss.pytorch.org/t/dataloader-sample-by-slices-from-dataset/113005/5
         """
-        print(f"__getitem__, idx = {idx}")
         if isinstance(idx, torch.Tensor):
             print("idx is a tensor")
             # Sorted indices
@@ -238,9 +258,6 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                tb = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["timebase"][
-                    idx_sorted
-                ]
                 data = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["signal_data"][
                     idx_sorted, :
                 ]
@@ -258,11 +275,10 @@ class shot_dataset_disk(Dataset):
                     output[0, current_ch : current_ch + pred.num_channels] = float(data)
 
                 current_ch += pred.num_channels
+            # Fetch time to disruption from last predictor.
+            ttd = fp[f"/transformed/ttd"][idx_sorted]
 
-        if self.transform:
-            output = self.transform(output)
-
-        return output
+        return output, ttd
 
     def __iter__(self):
         """Iterator"""

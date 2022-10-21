@@ -21,12 +21,24 @@ class frnn_multi_dataset:
     def __getitem__(self, idx_slice):
         """Fetches a slice from a given dataset.
 
+        Data is addressed using an idx_slice, which is tuple (i, slice)
+        where i indeces the dataset(shot) and slice defines the data whithin shot i.
+
+        For batching, it is convenient to receive a list of these.
+        This is implemented f.ex. in ~frnn_loader.loaders.frnn_loader.random_sequence_sampler
+
         Args:
             idx_slice: Tuple(int, slice) - Used to fetch a slice of data
+            idx_slice: List(Tuple(int, slice)) - Used for batching.
         """
-        print(f"frnn_multi_dataset.__getitem__: got ", idx_slice)
-        ds_idx, slice = idx_slice
-        return self.ds_list[ds_idx][slice]
+        if(isinstance(idx_slice, tuple)):
+            # If idx_slice is a tuple, map the slice directly to the requested dataset
+            ds_idx, slice = idx_slice
+            return self.ds_list[ds_idx][slice]
+        elif(isinstance(idx_slice, list)):
+            # If idx_slice is a list, do the mapping of index and slice individually
+            # and return a list.
+            return [self.ds_list[ds_idx][slice] for ds_idx, slice in idx_slice]    
 
 
 # End of file frnn_multi_dataset.py

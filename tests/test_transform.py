@@ -28,6 +28,9 @@ from os.path import join
 import unittest
 import tempfile
 import logging
+import shutil
+import errno
+
 import torch
 
 from frnn_loader.backends.fetchers import fetcher_d3d_v1
@@ -65,20 +68,32 @@ class test_transform_d3d_test100(unittest.TestCase):
 
                 break
 
-        cls.shotlist_disrupt = []
-        cls.ttd_list = []
-        with open(join(cls.basedir, "d3d_disrupt_100.txt"), "r") as fp:
-            for line in fp.readlines():
-                # Convert shotnr to int and ttd to float
-                shotnr, ttd = [trf(val) for trf, val in zip([int, float], line.split())]
-                cls.shotlist_disrupt.append(shotnr)
-                cls.ttd_list.append(ttd)
+        # cls.shotlist_disrupt = []
+        # cls.ttd_list = []
+        # with open(join(cls.basedir, "d3d_disrupt_100.txt"), "r") as fp:
+        #     for line in fp.readlines():
+        #         # Convert shotnr to int and ttd to float
+        #         shotnr, ttd = [trf(val) for trf, val in zip([int, float], line.split())]
+        #         cls.shotlist_disrupt.append(shotnr)
+        #         cls.ttd_list.append(ttd)
 
-                break
+        #         break
 
-        print("shotlist_clear = ", cls.shotlist_clear)
-        print("shotlist_disrupt = ", cls.shotlist_disrupt)
-        print("ttd = ", cls.ttd_list)
+        # print("shotlist_clear = ", cls.shotlist_clear)
+        # print("shotlist_disrupt = ", cls.shotlist_disrupt)
+        # print("ttd = ", cls.ttd_list)
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down unit backend tests.
+        
+        * Delete temp directory.
+        """
+        try:
+            shutil.rmtree(cls.root)  # delete directory
+        except OSError as exc:
+            if exc.errno != errno.ENOENT:  # ENOENT - no such file or directory
+                raise  # re-raise exception   
 
     def test_transform(self):
         """Instantiate datasets that include TTD transformation"""
@@ -86,7 +101,7 @@ class test_transform_d3d_test100(unittest.TestCase):
         my_resampler = resampler_causal(0.0, 2e3, 1e0)
 
         # Instantiate a file backend
-        my_backend_file = backend_hdf5("/home/rkube/datasets/frnn/")
+        my_backend_file = backend_hdf5(self.root)
         my_fetcher = fetcher_d3d_v1()
         root = self.root
 
@@ -97,12 +112,13 @@ class test_transform_d3d_test100(unittest.TestCase):
         ds_clear_list = []
         for shotnr in self.shotlist_clear:
             ds = shot_dataset_disk(shotnr, 
-                                   predictors=[signal_fs07, signal_q95], 
+                                   predictors=[signal_fs07, signal_q95, signal_pinj], 
                                    resampler=my_resampler, 
                                    backend_file=my_backend_file, 
                                    fetcher=my_fetcher, 
                                    root=root,
                                    download=True,
+                                   is_disruptive=False,
                                    dtype=torch.float32)
 
             ds_clear_list.append(ds)
