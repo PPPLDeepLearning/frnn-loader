@@ -22,7 +22,7 @@ class shot_dataset_disk(Dataset):
     This dataset maps the __getitem__ method to a pre-cached version on disk.
     The cached version on disk is built
     * Using the predictors and targets
-    * With all transformations applied to them.
+    * With all normalization applied to them.
 
     Args
     * shotnr (int)
@@ -31,9 +31,9 @@ class shot_dataset_disk(Dataset):
     * backend_file ~frnn_loader.backends.backend
     * fetcher (~frnn_loader.backends.fetcher)
     * cache
-    * root (string) - Directory where transformed data is stored
+    * root (string) - Directory data is stored
     * download (bool) - If true, downloadin missing data
-    * transform (transform) - Transformations applied to data
+    * normalize (normalize) - Normalization applied to data
     * dtype
 
     """
@@ -47,7 +47,7 @@ class shot_dataset_disk(Dataset):
         fetcher,
         root,
         download=False,
-        transform=None,
+        normalizer=None,
         is_disruptive=False,
         dtype=torch.float32,
     ):
@@ -59,7 +59,7 @@ class shot_dataset_disk(Dataset):
         self.fetcher = fetcher
         self.root = root
         self.download = download
-        self.transform = transform
+        self.normalizer = normalizer
         self.is_disruptive = is_disruptive
         self.dtype = dtype
         # Pre-calculate the array shape. That is, the sum of the channels over all predictors
@@ -75,65 +75,61 @@ class shot_dataset_disk(Dataset):
 
         # Create a temporary file name for HDF5 storage.
         # Note that this is not the data file that contains the downloaded
-        # signal data for a given shot. It is a new file that stores the transformed
+        # signal data for a given shot. It is a new file that stores the normalized
         # data.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
         with h5py.File(self.tmp_fname, "a") as fp:
-            # In the data-loading stage data will be signal by signal. The transformed and
+            # In the data-loading stage data will be signal by signal. The normalized and
             # resampled signals are stored in HDF5
-            h5_grp_trf = fp.create_group("transformed")
-            h5_grp_trf.attrs["shotnr"] = self.shotnr
-
-            tmp = np.random.randn(100)
-
-            # ds_tmp = h5_grp_trf.create_dataset("tmp", tmp.shape, dtype="f")
-            # ds_tmp[:] = tmp[:]
+            h5_grp_norm = fp.create_group("normalized")
+            h5_grp_norm.attrs["shotnr"] = self.shotnr
 
             # Next is pre-processing. We attack it like this
             # 1. Fetch the signals from either HDF5 or MDS
             # 2. Re-sampled the signals
-            # 3. Apply transformation to signal data and transform timebase to time-to-disruption (ttd)
+            # 3. Apply normalization to signal data and change timebase to time-to-disruption (ttd)
             # 4. Store the data in a hdf5 file.
 
-            invalid_signals = 0  # Count number of invalid signals
-            for signal in self.predictors:
+            invalid_predictors = 0  # Count number of invalid signals
+            current_ch = 0  # Accumulate channels used by the predictors
+            for pred in self.predictors:
                 # 1st step: Fetch the data
                 try:
-                    tb, signal_data = self.backend_file.load(signal.info, self.shotnr)
+                    tb, signal_data = self.backend_file.load(pred.info, self.shotnr)
 
                 except SignalCorruptedError as err:
                     logging.error(f"SignalCorrupted occured: {err}")
-                    invalid_signals += 1
+                    invalid_predictors += 1
                     raise (err)
 
                 except NotDownloadedError as err:
                     logging.error(f"Signal not downloaded: {err}")
                     if self.download:
-                        logging.info(f"Downloading signal {signal}")
+                        logging.info(f"Downloading signal for {pred}")
                         tb, _, signal_data, _, _, _ = self.fetcher.fetch(
-                            signal.info, self.shotnr
+                            pred.info, self.shotnr
                         )
-                        self.backend_file.store(
-                            signal.info, self.shotnr, tb, signal_data
-                        )
+                        self.backend_file.store(pred.info, self.shotnr, tb, signal_data)
                     else:
                         raise err
 
                 logging.info(
-                    f"Loaded signal {signal}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}"
+                    f"Loaded predictor signal {pred}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}"
                 )
 
                 # 2nd step: Re-sample
                 tb_rs, signal_data_rs = resampler(tb, signal_data)
                 logging.info(
-                    f"Resampled signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
+                    f"Resampled predictor signal {pred}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
                 )
-                # # 3rd step: Transform
-                # if transform is not None:
-                #     signal_data_rs = self.transform(signal_data_rs)
-                # logging.info(
-                #     f"Transformed signal {signal}: tb.shape = {tb_rs.shape}, signal.shape = {signal_data_rs.shape}"
-                # )
+                # 3rd step: normalize
+                if self.normalizer is not None:
+                    signal_data_rs = self.normalizer(
+                        signal_data_rs, current_ch, current_ch + pred.num_channels
+                    )
+                logging.info(
+                    f"Normalized predictor signal {pred}: mean = {signal_data_rs.mean()}, std = {signal_data_rs.std()}"
+                )
 
                 # 4th step: Transform time to time-to-disruption
                 # T_max = conf['data']['T_max']
@@ -147,15 +143,16 @@ class shot_dataset_disk(Dataset):
                     ttd = np.log10(ttd + 0.1 * resampler.dt)
 
                 # 4th step: store processed data in HDF5
-                grp = h5_grp_trf.create_group(signal.info["LocalPath"] + "_trf")
+                grp = h5_grp_norm.create_group(pred.info["LocalPath"] + "_norm")
                 dset = grp.create_dataset(
                     "signal_data", signal_data_rs.shape, dtype="f"
                 )
                 dset[:] = signal_data_rs[:]
-            print("tb_rs.shape = ", tb_rs.shape)
-            dset = h5_grp_trf.create_dataset("tb", tb_rs.shape, dtype="f")
+                current_ch += pred.num_channels
+
+            dset = h5_grp_norm.create_dataset("tb", tb_rs.shape, dtype="f")
             dset[:] = tb_rs[:]
-            dset = h5_grp_trf.create_dataset("ttd", ttd.shape, dtype="f")
+            dset = h5_grp_norm.create_dataset("ttd", ttd.shape, dtype="f")
             dset[:] = ttd[:]
 
     def delete_data_file(self):
@@ -173,9 +170,18 @@ class shot_dataset_disk(Dataset):
 
         Note: Performance could be improved by implementing slicing directly here:
         https://discuss.pytorch.org/t/dataloader-sample-by-slices-from-dataset/113005/5
+
+        Args:
+            idx: Indices. Either torch.tensor, list, slice, or scalar
+
+        Output:
+            output: torch.tensor: Shot data. Dimensions:
+                        [seq_length, feature]
+            ttd: torch.tensor: Time. Dimensions:
+                        [seq_length, feature]
+
         """
         if isinstance(idx, torch.Tensor):
-            print("idx is a tensor")
             # Sorted indices
             sort_idx = torch.argsort(idx)
             idx_sorted = idx[sort_idx]
@@ -190,8 +196,6 @@ class shot_dataset_disk(Dataset):
             idx_sorted = idx_sorted.tolist()
 
             # Number of elements to fetch
-
-            print(idx_sorted)
             num_ele = len(idx)
         elif isinstance(idx, list):
             # Assume that idx is a list if indices
@@ -258,7 +262,8 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                data = fp[f"/transformed/{pred.info['LocalPath']}_trf"]["signal_data"][
+                # print("pred = ", pred.info)
+                data = fp[f"/normalized/{pred.info['LocalPath']}_norm"]["signal_data"][
                     idx_sorted, :
                 ]
 
@@ -276,18 +281,17 @@ class shot_dataset_disk(Dataset):
 
                 current_ch += pred.num_channels
             # Fetch time to disruption from last predictor.
-            ttd = fp[f"/transformed/ttd"][idx_sorted]
+            # Reshape ttd to size (seq_length, 1)
+            ttd = torch.tensor(fp[f"/normalized/ttd"][idx_sorted]).reshape(-1, 1)
 
         return output, ttd
 
     def __iter__(self):
         """Iterator"""
-        print("Calling __iter__")
         return self
 
     def __next__(self):
         """Implement iterable capability"""
-        print(f"Calling __next__: _current_index={self._current_index}")
         if self._current_index < self.__len__():
             rval = self.__getitem__(self._current_index)
             self._current_index += 1

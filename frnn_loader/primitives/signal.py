@@ -84,8 +84,8 @@ class signal_base:
     def __lt__(self, other):
         return self.__str__().__lt__(other.__str__())
 
-    def __hash__(self):
-        return myhash(self.__str__())
+    # def __hash__(self):
+    #     return myhash(self.__str__())
 
     def __str__(self):
         return f"{self.info['Machine']}: {self.info['Description']}"

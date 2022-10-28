@@ -39,7 +39,7 @@ class mean_std_normalizer:
         Q = mp.Queue()
         processes = []
         for ds in ds_list:
-            p = mp.Process(target=calc_mean_single, args=(ds[:].numpy(), Q))
+            p = mp.Process(target=calc_mean_single, args=(ds[:][0].numpy(), Q))
             p.start()
             processes.append(p)
 
@@ -62,7 +62,7 @@ class mean_std_normalizer:
         # The approach is the same as for calc_mean_single.
         processes = []
         for ds in ds_list:
-            p = mp.Process(target=calc_var_single, args=(ds[:].numpy(), mean_all, Q))
+            p = mp.Process(target=calc_var_single, args=(ds[:][0].numpy(), mean_all, Q))
             p.start()
             processes.append(p)
 
@@ -84,16 +84,26 @@ class mean_std_normalizer:
         self.mean_all = torch.tensor(mean_all)
         self.std_all = torch.tensor(np.sqrt(var_all))
 
-    def __call__(self, X):
+    def __call__(self, X, i0=None, i1=None):
         """Returns normalized values.
 
         Args
             X (array-like) Un-normalized data
+            i0: Channel start index for normalization
+            i1: Channel stop index for normalization
 
         Returns:
             X_norm (array_like) - Normalized data
         """
-        return (X - self.mean_all) / self.std_all
+        if i0 is None and i1 is not None:
+            raise IndexError("Both, i0 and i1 are either None or a positive number")
+        if i0 is not None and i1 is None:
+            raise IndexError("Both, i0 and i1 are either None or a positive number")
+
+        if i0 is None and i1 is None:
+            return (X - self.mean_all) / self.std_all
+        else:
+            return (X - self.mean_all[i0:i1]) / self.std_all[i0:i1]
 
 
 # end of file normalizers.py

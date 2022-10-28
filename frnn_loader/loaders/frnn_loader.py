@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Custom multi-threaded dataloader that works with shot_dataset_disk
 import logging
 from math import ceil
 import numpy as np
@@ -113,12 +112,12 @@ class batched_random_sequence_sampler(random_sequence_sampler):
 
         # When using batch_size > 2, draw multiple samples, put them
         # in a list and let collate_fn deal with the rest
-        for i in range(0, self.num_draws // self.batch_size, self.batch_size):
+        for i in range(0, self.num_draws, self.batch_size):
             yield [
-                (
+                [
                     shot_idx[i + b],
                     slice(start_idx[i + b], start_idx[i + b] + self.seq_length, 1),
-                )
+                ]
                 for b in range(self.batch_size)
             ]
 
