@@ -3,6 +3,7 @@
 import torch
 import numpy as np
 from frnn_loader.utils.errors import SignalCorruptedError
+
 """Construct list of valid shot times.
 
 Measurement data is stored for a time interval around experiments. A plasma shot
@@ -25,8 +26,8 @@ class filter_ip_thresh:
             ip_thresh (Float): Threshold under which we discard the shot.
             abs (bool): If True, test the criterion against the absolute value of the threshold.
                         I.e. account for clock- and anti-clockwise current.
-        
-        
+
+
         """
         self.ip_thresh = ip_thresh
         self.abs = abs
@@ -54,7 +55,7 @@ class filter_ip_thresh:
                 data = abs(data)
 
         good_idx = (data > self.ip_thresh).squeeze()
-        if (good_idx.sum() < 100):
+        if good_idx.sum() < 100:
             raise SignalCorruptedError("Bad signal")
         tb_good = tb[good_idx]
         tmin = tb_good.min().item()

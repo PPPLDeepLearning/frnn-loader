@@ -87,7 +87,7 @@ class mean_std_normalizer:
     def __call__(self, X, i0=None, i1=None):
         """Returns normalized values.
 
-        X is either the same 
+        X is either the same
 
         Args
             X (array-like) Un-normalized data
