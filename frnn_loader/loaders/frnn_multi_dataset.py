@@ -51,5 +51,8 @@ class frnn_multi_dataset:
             raise StopIteration
         yield from self.ds_list
 
+    def __len__(self):
+        return len(self.ds_list)
+
 
 # End of file frnn_multi_dataset.py

@@ -134,13 +134,15 @@ class shot_dataset_disk(Dataset):
                 # 4th step: Transform time to time-to-disruption
                 # T_max = conf['data']['T_max']
                 # dt = conf['data']['dt']
+                # TODO (RK): Verify how this translates to using milliseconds as units
                 if self.is_disruptive:
                     ttd = max(tb_rs) - tb_rs
-                    ttd = np.clip(ttd, 0, 10.0)
+                    # Maximum time to disruption
+                    ttd = np.clip(ttd, 0, 200.0)
                 else:
-                    ttd = 10.0 * np.ones_like(tb_rs)
+                    ttd = 200.0 * np.ones_like(tb_rs)
                     #
-                    ttd = np.log10(ttd + 0.1 * resampler.dt)
+                ttd = np.log10(ttd + 0.1 * resampler.dt)
 
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_norm.create_group(pred.info["LocalPath"] + "_norm")

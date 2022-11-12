@@ -75,7 +75,6 @@ class backend_txt(backend):
             for line in fp.readlines():
                 float_vals.append([float(val) for val in line.split()])
         data = torch.tensor(float_vals, dtype=self.dtype)
-        # print(f"... In load. data.shape = ", data.shape)
         # First column is the timebase
         # After second column is the signal data
         return data[:, 0], data[:, 1:]

@@ -81,6 +81,14 @@ efswmhd:
   ndim: 0
   Channels: 1
 
+wmhd:
+  Machine: D3D
+  Description: Stored Energy
+  PTData: wmhd
+  LocalPath: wmhd
+  ndim: 0
+  Channels: 1
+
 dusbradial:
   Machine: D3D
   Description: Locked Mode Amplitude

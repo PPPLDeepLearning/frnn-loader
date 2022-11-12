@@ -119,6 +119,8 @@ class batched_random_sequence_sampler(random_sequence_sampler):
                     slice(start_idx[i + b], start_idx[i + b] + self.seq_length, 1),
                 ]
                 for b in range(self.batch_size)
+                # Filter to drop some elements when approaching upper range of iteration
+                if (i + b) < self.num_draws
             ]
 
         # Handle final samples if drop_last=False
