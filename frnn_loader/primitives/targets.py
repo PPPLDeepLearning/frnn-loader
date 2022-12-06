@@ -17,14 +17,15 @@ import torch
 import logging
 
 
-class target():
+class target:
     """target - Abstract base class"""
+
     pass
 
 
 class target_TTD(target):
     """Time-To-Disruption.
-    
+
     Transforms a time series into a logarithmic count-down.
     """
 
@@ -56,16 +57,23 @@ class target_TTELM(target):
     linearly to 0 as an ELM approaches.
 
     """
-    def __init__(self, max_ttelm=10.0, dt=1.0, threshold=lambda x: x.mean() * 1.5,
-                 deadtime=5.0, peak_width=5):
+
+    def __init__(
+        self,
+        max_ttelm=10.0,
+        dt=1.0,
+        threshold=lambda x: x.mean() * 1.5,
+        deadtime=5.0,
+        peak_width=5,
+    ):
         """
-            Args:
-                max_ttelm, float: Maximum time to ELM. in milliseconds.
-                dt, float: Sample spacing, in milliseconds
-                thresold, callable:
-                deadtime, float: Separation of peaks, in milliseconds
-                peak_width, int: Number of neighbouring elements a peak has to exceed
-        
+        Args:
+            max_ttelm, float: Maximum time to ELM. in milliseconds.
+            dt, float: Sample spacing, in milliseconds
+            thresold, callable:
+            deadtime, float: Separation of peaks, in milliseconds
+            peak_width, int: Number of neighbouring elements a peak has to exceed
+
         """
         self.max_ttelm = max_ttelm
         self.dt = dt
@@ -75,7 +83,6 @@ class target_TTELM(target):
         self.deadtime_ix = int(math.ceil(deadtime / dt))
         self.peak_width = int(peak_width)
 
-    
     def __call__(self, tb, signal):
         """Returns time-to-ELM, calculated from signal.
 
@@ -86,7 +93,7 @@ class target_TTELM(target):
         Output:
             ttelm: torch.tensor: Time-base that counts down to time of next ELM
         """
-        assert(signal.size == signal.size)
+        assert signal.size == signal.size
 
         # Detect indices where ELM appear.
         elm_idx = self.peak_detection(signal)
@@ -96,20 +103,27 @@ class target_TTELM(target):
         torch.flip(elm_idx, dims=[0])
         # Initialize ttelm arry with default value
         ttelm = self.max_ttelm * torch.ones_like(tb)
-        
+
         # Look-back used to fill up ttelm
-        lookback = torch.clip(torch.hstack([torch.tensor([5]), elm_idx[1:] - elm_idx[:-1]]), 
-                              0, self.deadtime_ix)
-        
+        lookback = torch.clip(
+            torch.hstack([torch.tensor([5]), elm_idx[1:] - elm_idx[:-1]]),
+            0,
+            self.deadtime_ix,
+        )
+
         for lb, ix in zip(lookback, elm_idx):
-            print(lb, ix, ttelm[ix + 1 - lb + 1:ix+1])
+            print(lb, ix, ttelm[ix + 1 - lb + 1 : ix + 1])
             # Insert linear count-down windows into ttelm target
-            ttelm[ix - lb + 1:ix + 1] = ttelm[ix - lb + 1] + (0.0 - ttelm[ix-lb]) / lb * torch.arange(1, lb + 1)
-            print("after: ", ttelm[ix + 1 - lb:ix+1])
+            ttelm[ix - lb + 1 : ix + 1] = ttelm[ix - lb + 1] + (
+                0.0 - ttelm[ix - lb]
+            ) / lb * torch.arange(1, lb + 1)
+            print("after: ", ttelm[ix + 1 - lb : ix + 1])
 
         return ttelm
 
-    def peak_detection(self, signal): # , deadtime=5, threshold=self.threshold, peak_width=5):
+    def peak_detection(
+        self, signal
+    ):  # , deadtime=5, threshold=self.threshold, peak_width=5):
         """Detects ELMs in a time series.
 
         ELMs are defined as peaks in a time seris that exceed a threshold.
@@ -149,7 +163,9 @@ class target_TTELM(target):
             max_values = max_values[:num_big_ones]
             max_idx = max_idx[:num_big_ones]
         except:
-            raise BadDataException("detect_peaks_1d: No peaks in the unmasked part of the array.")
+            raise BadDataException(
+                "detect_peaks_1d: No peaks in the unmasked part of the array."
+            )
 
         # Mark the indices we need to skip here
         max_idx_copy = torch.zeros_like(max_idx)

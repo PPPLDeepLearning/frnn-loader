@@ -58,7 +58,9 @@ class filter_ip_thresh:
 
         good_idx = (data > self.ip_thresh).squeeze()
         if good_idx.sum() < self.num_pts:
-            raise SignalCorruptedError(f"{self}: Bad signal: Fewer than {self.num_pts} points are valid.")
+            raise SignalCorruptedError(
+                f"{self}: Bad signal: Fewer than {self.num_pts} points are valid."
+            )
         tb_good = tb[good_idx]
         tmin = tb_good.min().item()
         tmax = tb_good.max().item()
