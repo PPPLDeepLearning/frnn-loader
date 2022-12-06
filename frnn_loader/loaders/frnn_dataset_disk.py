@@ -63,7 +63,7 @@ class shot_dataset_disk(Dataset):
         self.download = download
         self.normalizer = normalizer
         self.is_disruptive = is_disruptive
-        self.target = target()    # Instantiate target
+        self.target = target()  # Instantiate target
         self.dtype = dtype
         # Pre-calculate the array shape. That is, the sum of the channels over all predictors
         self.sum_all_channels = sum([pred.num_channels for pred in self.predictors])
@@ -135,8 +135,6 @@ class shot_dataset_disk(Dataset):
                     f"Normalized predictor signal {pred}: mean = {signal_data_rs.mean()}, std = {signal_data_rs.std()}"
                 )
 
-
-
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_norm.create_group(pred.info["LocalPath"] + "_norm")
                 dset = grp.create_dataset(
@@ -144,7 +142,6 @@ class shot_dataset_disk(Dataset):
                 )
                 dset[:] = signal_data_rs[:]
                 current_ch += pred.num_channels
-
 
             #####
             ##### Old code: hard-code TTD target
@@ -164,7 +161,6 @@ class shot_dataset_disk(Dataset):
             ##### TODO: New code - Implement abstraction of prediction targets
             ##### see primitives/targets.py
             target = self.target(tb, None)
-
 
             dset = h5_grp_norm.create_dataset("tb", tb_rs.shape, dtype="f")
             dset[:] = tb_rs[:]
