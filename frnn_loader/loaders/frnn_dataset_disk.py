@@ -13,6 +13,7 @@ import torch
 from torch.utils.data import Dataset
 
 from frnn_loader.primitives.signal import signal_0d
+from frnn_loader.primitives.targets import target_TTD, target_TTELM
 from frnn_loader.utils.errors import SignalCorruptedError, NotDownloadedError
 
 
@@ -49,6 +50,7 @@ class shot_dataset_disk(Dataset):
         download=False,
         normalizer=None,
         is_disruptive=False,
+        target=target_TTD,
         dtype=torch.float32,
     ):
         """Initializes the disk dataset."""
@@ -61,6 +63,7 @@ class shot_dataset_disk(Dataset):
         self.download = download
         self.normalizer = normalizer
         self.is_disruptive = is_disruptive
+        self.target = target()    # Instantiate target
         self.dtype = dtype
         # Pre-calculate the array shape. That is, the sum of the channels over all predictors
         self.sum_all_channels = sum([pred.num_channels for pred in self.predictors])
@@ -87,8 +90,9 @@ class shot_dataset_disk(Dataset):
             # Next is pre-processing. We attack it like this
             # 1. Fetch the signals from either HDF5 or MDS
             # 2. Re-sampled the signals
-            # 3. Apply normalization to signal data and change timebase to time-to-disruption (ttd)
-            # 4. Store the data in a hdf5 file.
+            # 3. Apply normalization to signal data
+            # 4. Instantiate prediction targets after all signal data has been processed
+            # 5. Store the data in a hdf5 file.
 
             invalid_predictors = 0  # Count number of invalid signals
             current_ch = 0  # Accumulate channels used by the predictors
@@ -131,18 +135,7 @@ class shot_dataset_disk(Dataset):
                     f"Normalized predictor signal {pred}: mean = {signal_data_rs.mean()}, std = {signal_data_rs.std()}"
                 )
 
-                # 4th step: Transform time to time-to-disruption
-                # T_max = conf['data']['T_max']
-                # dt = conf['data']['dt']
-                # TODO (RK): Verify how this translates to using milliseconds as units
-                if self.is_disruptive:
-                    ttd = max(tb_rs) - tb_rs
-                    # Maximum time to disruption
-                    ttd = np.clip(ttd, 0, 200.0)
-                else:
-                    ttd = 200.0 * np.ones_like(tb_rs)
-                    #
-                ttd = np.log10(ttd + 0.1 * resampler.dt)
+
 
                 # 4th step: store processed data in HDF5
                 grp = h5_grp_norm.create_group(pred.info["LocalPath"] + "_norm")
@@ -152,9 +145,30 @@ class shot_dataset_disk(Dataset):
                 dset[:] = signal_data_rs[:]
                 current_ch += pred.num_channels
 
+
+            #####
+            ##### Old code: hard-code TTD target
+            # 4th step: Transform time to time-to-disruption
+            # T_max = conf['data']['T_max']
+            # dt = conf['data']['dt']
+            # TODO (RK): Verify how this translates to using milliseconds as units
+            # if self.is_disruptive:
+            #     target = max(tb_rs) - tb_rs
+            #     # Maximum time to disruption
+            #     target = np.clip(target, 0, 200.0)
+            # else:
+            #     target = 200.0 * np.ones_like(tb_rs)
+            #     #
+            # target = np.log10(target + 0.1 * resampler.dt)
+            #####
+            ##### TODO: New code - Implement abstraction of prediction targets
+            ##### see primitives/targets.py
+            target = self.target(tb, None)
+
+
             dset = h5_grp_norm.create_dataset("tb", tb_rs.shape, dtype="f")
             dset[:] = tb_rs[:]
-            dset = h5_grp_norm.create_dataset("ttd", ttd.shape, dtype="f")
+            dset = h5_grp_norm.create_dataset("target", target.shape, dtype="f")
             dset[:] = ttd[:]
 
     def delete_data_file(self):

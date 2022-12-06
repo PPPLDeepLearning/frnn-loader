@@ -1,8 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from frnn_loader.utils.errors import BadDataException
 import torch
+from frnn_loader.primitives.signal import signal_base
+from frnn_loader.utils.errors import BadDataException
+
 
 """
     Implements transformation of signal data into targets.
@@ -57,6 +59,8 @@ class target_TTELM(target):
     linearly to 0 as an ELM approaches.
 
     """
+    # Signals required to build this target. See data/d3d_signals.yaml
+    required_signals = ["Filterscope FS07"]
 
     def __init__(
         self,
