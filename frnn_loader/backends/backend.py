@@ -4,7 +4,7 @@
 
 Measurements from fusion experiments are typically accessed through `MDSplus <https://www.mdsplus.org>`_
 Backends define a mapping from MDSplus to local files. How individual signals are mapped to
-files is defined in the file `data/d3d_signals.yaml`.
+files is defined in the yaml specification provided `here` <https://github.com/PlasmaControl/d3d_signals/>
 
 As an example, consider
 
@@ -87,7 +87,7 @@ class backend:
         >>> from frnn_loader.backends.backend_txt import backend_txt
         >>> signal_fs07 = signal_0d("fs07")
         >>> my_backend = backend_txt("/home/rkube/datasets/frnn/dataset01")
-        >>> my_backend._construct_file_path(signa_fs07.info, 180400)
+        >>> my_backend._construct_file_path(signal_fs07.info, 180400)
             /home/rkube/datasets/frnn/dataset01/d3d/fs07/180400.txt
 
         This routine accesses dictionary keys ``Machine`` and ``LocalPath``

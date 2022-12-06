@@ -43,4 +43,9 @@ class MDSNotFoundException(Exception):
     pass
 
 
+class BadDataException(Exception):
+    """Raised when data analysis goes bad."""
+
+    pass
+
 # end of file errors.py

@@ -6,6 +6,9 @@ Data signals authorities are the respective experiments MDS servers.
 This module deefines classes that allows to fetch signals from these servers.
 
 Signals, together with metadata are defined in frnn_loader/data/d3d_signals.yaml.
+
+Signals, together with metadata needed to retrieve them from atlas.gat.com are
+defined in https://github.com/PlasmaControl/d3d_signals/
 In particular, the signal_info dict is constructed using this metadata.
 """
 

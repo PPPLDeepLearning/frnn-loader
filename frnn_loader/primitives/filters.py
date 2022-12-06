@@ -19,17 +19,19 @@ and end in a shot when a certain condition is fulfilled.
 class filter_ip_thresh:
     """A filter based on plasma current"""
 
-    def __init__(self, ip_thresh=0.2, abs=False):
+    def __init__(self, ip_thresh=0.2, num_pts=100, abs=True):
         """Initializes Ip threshold filter
 
         Args:
             ip_thresh (Float): Threshold under which we discard the shot.
+            num_pts (int): Number of points that have to exceed the threshold
             abs (bool): If True, test the criterion against the absolute value of the threshold.
-                        I.e. account for clock- and anti-clockwise current.
+                        I.e. account for clock- and anti-clockwise current. Default: True
 
 
         """
         self.ip_thresh = ip_thresh
+        self.num_pts = num_pts
         self.abs = abs
 
     def __call__(self, tb, data):
@@ -55,8 +57,8 @@ class filter_ip_thresh:
                 data = abs(data)
 
         good_idx = (data > self.ip_thresh).squeeze()
-        if good_idx.sum() < 100:
-            raise SignalCorruptedError("Bad signal")
+        if good_idx.sum() < self.num_pts:
+            raise SignalCorruptedError(f"{self}: Bad signal: Fewer than {self.num_pts} points are valid.")
         tb_good = tb[good_idx]
         tmin = tb_good.min().item()
         tmax = tb_good.max().item()
