@@ -7,6 +7,7 @@ they need to be re-sampled onto a common time-base.
 """
 
 import torch
+import logging
 
 
 class resampler:

@@ -13,7 +13,7 @@ import torch
 from torch.utils.data import Dataset
 
 from frnn_loader.primitives.signal import signal_0d
-from frnn_loader.primitives.targets import target_TTD, target_TTELM
+from frnn_loader.primitives.targets import target_TTD, target_TTELM, target_NULL
 from frnn_loader.utils.errors import SignalCorruptedError, NotDownloadedError
 
 
@@ -25,9 +25,11 @@ class shot_dataset_disk(Dataset):
     * Using the predictors and targets
     * With all normalization applied to them.
 
+    Make use of tuples for things that should be immutable, such as the list of predictors
+
     Args
     * shotnr (int)
-    * predictors (list(str))
+    * predictors (tuple(str))
     * resampler ~frnn_loader.primitives.resampler
     * backend_file ~frnn_loader.backends.backend
     * fetcher (~frnn_loader.backends.fetcher)
@@ -50,7 +52,7 @@ class shot_dataset_disk(Dataset):
         download=False,
         normalizer=None,
         is_disruptive=False,
-        target=target_TTD,
+        target=None,
         dtype=torch.float32,
     ):
         """Initializes the disk dataset."""
@@ -76,16 +78,31 @@ class shot_dataset_disk(Dataset):
             assert self.fetcher is not None
         assert isdir(self.root)
 
+        # Assert that predictors is a tuple. This guarantees that they are immutable throughout
+        # the life-time of the object. This is critical, as iteration over predictors is key to
+        # correct ordering of the data.
+        assert(isinstance(self.predictors, tuple))
+
+        # Local name for backend to store the data in. This is derived from `LocalPath` in
+        # signals.yaml. Append _norm to indicate whether data was normalized
+        if self.normalizer is None:
+            self.group_name = "raw"
+        else:
+            self.group_name = "normalized"
+
+
         # Create a temporary file name for HDF5 storage.
         # Note that this is not the data file that contains the downloaded
         # signal data for a given shot. It is a new file that stores the normalized
         # data.
         self.tmp_fname = join(self.root, f"{next(tempfile._get_candidate_names())}.h5")
+
+        logging.info(f"Storing transformed data for shot {shotnr} in {self.tmp_fname}")
         with h5py.File(self.tmp_fname, "a") as fp:
             # In the data-loading stage data will be signal by signal. The normalized and
             # resampled signals are stored in HDF5
-            h5_grp_norm = fp.create_group("normalized")
-            h5_grp_norm.attrs["shotnr"] = self.shotnr
+            h5_grp = fp.create_group(self.group_name)
+            h5_grp.attrs["shotnr"] = self.shotnr
 
             # Next is pre-processing. We attack it like this
             # 1. Fetch the signals from either HDF5 or MDS
@@ -117,10 +134,6 @@ class shot_dataset_disk(Dataset):
                     else:
                         raise err
 
-                logging.info(
-                    f"Loaded predictor signal {pred}: tb.shape = {tb.shape}, signal.shape = {signal_data.shape}"
-                )
-
                 # 2nd step: Re-sample
                 tb_rs, signal_data_rs = resampler(tb, signal_data)
                 logging.info(
@@ -136,19 +149,41 @@ class shot_dataset_disk(Dataset):
                 )
 
                 # 4th step: store processed data in HDF5
-                grp = h5_grp_norm.create_group(pred.info["LocalPath"] + "_norm")
+                grp = h5_grp.create_group(pred.info["LocalPath"])
                 dset = grp.create_dataset(
                     "signal_data", signal_data_rs.shape, dtype="f"
                 )
                 dset[:] = signal_data_rs[:]
                 current_ch += pred.num_channels
 
+            # 4. Instantiate prediction target. Do this only on normalized signals
+            if self.normalizer is not None:
+                # Load the predictor requires to calculate the target. This may go awry in several places
+                try:
+                    signal_data = fp[f"/{self.group_name}/{target.required_signal.info['LocalPath']}"]["signal_data"][:]
+                except AttributeError as e:
+                    # Attribute error may be raised when target.required_signal as no field info
+                    # Assume that the required data is None and move on.
+                    assert(target.required_signal == None)
+                    signal_data = target.required_signal
+                except KeyError as e:
+                    # KeyError may be raised when the signal is not available in the HDF5 file. Then we have a problem.
+                    raise e
+
+                target_data = self.target(tb_rs, signal_data)
+                dset = h5_grp.create_dataset("target", target_data.shape, dtype="f")
+                dset[:] = target[:]
+
+            dset = h5_grp.create_dataset("tb", tb_rs.shape, dtype="f")
+            dset[:] = tb_rs[:]
+
+
             #####
             ##### Old code: hard-code TTD target
             # 4th step: Transform time to time-to-disruption
-            # T_max = conf['data']['T_max']
-            # dt = conf['data']['dt']
-            # TODO (RK): Verify how this translates to using milliseconds as units
+            #T_max = conf['data']['T_max']
+            #dt = conf['data']['dt']
+            #TODO (RK): Verify how this translates to using milliseconds as units
             # if self.is_disruptive:
             #     target = max(tb_rs) - tb_rs
             #     # Maximum time to disruption
@@ -160,12 +195,9 @@ class shot_dataset_disk(Dataset):
             #####
             ##### TODO: New code - Implement abstraction of prediction targets
             ##### see primitives/targets.py
-            target = self.target(tb, None)
+            #target = self.target(tb, None)
 
-            dset = h5_grp_norm.create_dataset("tb", tb_rs.shape, dtype="f")
-            dset[:] = tb_rs[:]
-            dset = h5_grp_norm.create_dataset("target", target.shape, dtype="f")
-            dset[:] = ttd[:]
+
 
     def delete_data_file(self):
         """Deletes the temporary datafile.
@@ -274,8 +306,7 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                # print("pred = ", pred.info)
-                data = fp[f"/normalized/{pred.info['LocalPath']}_norm"]["signal_data"][
+                data = fp[f"/{self.group_name}/{pred.info['LocalPath']}"]["signal_data"][
                     idx_sorted, :
                 ]
 
@@ -292,11 +323,11 @@ class shot_dataset_disk(Dataset):
                     output[0, current_ch : current_ch + pred.num_channels] = float(data)
 
                 current_ch += pred.num_channels
-            # Fetch time to disruption from last predictor.
+            # Fetch prediction target
             # Reshape ttd to size (seq_length, 1)
-            ttd = torch.tensor(fp[f"/normalized/ttd"][idx_sorted]).reshape(-1, 1)
+            target = torch.tensor(fp[f"/{self.group_name}/target"][idx_sorted]).reshape(-1, 1)
 
-        return output, ttd
+        return output, target
 
     def __iter__(self):
         """Iterator"""

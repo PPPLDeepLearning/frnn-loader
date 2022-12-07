@@ -67,6 +67,7 @@ class backend_hdf5(backend):
             err_str = f"Unable to load timebase/signal for shot {shotnr} signal {sig_info['LocalPath']}"
             logging.error(err_str)
             raise NotDownloadedError(err_str)
+        logging.info(f"Loaded signal {sig_info['Machine']}: {sig_info['Description']} from {fname}.  tb.shape = {tb.shape}, signal.shape = {data.shape}")
 
         return tb, data
 
