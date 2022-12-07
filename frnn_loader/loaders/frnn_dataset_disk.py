@@ -81,7 +81,7 @@ class shot_dataset_disk(Dataset):
         # Assert that predictors is a tuple. This guarantees that they are immutable throughout
         # the life-time of the object. This is critical, as iteration over predictors is key to
         # correct ordering of the data.
-        assert(isinstance(self.predictors, tuple))
+        assert isinstance(self.predictors, tuple)
 
         # Local name for backend to store the data in. This is derived from `LocalPath` in
         # signals.yaml. Append _norm to indicate whether data was normalized
@@ -89,7 +89,6 @@ class shot_dataset_disk(Dataset):
             self.group_name = "raw"
         else:
             self.group_name = "normalized"
-
 
         # Create a temporary file name for HDF5 storage.
         # Note that this is not the data file that contains the downloaded
@@ -160,11 +159,13 @@ class shot_dataset_disk(Dataset):
             if self.normalizer is not None:
                 # Load the predictor requires to calculate the target. This may go awry in several places
                 try:
-                    signal_data = fp[f"/{self.group_name}/{target.required_signal.info['LocalPath']}"]["signal_data"][:]
+                    signal_data = fp[
+                        f"/{self.group_name}/{target.required_signal.info['LocalPath']}"
+                    ]["signal_data"][:]
                 except AttributeError as e:
                     # Attribute error may be raised when target.required_signal as no field info
                     # Assume that the required data is None and move on.
-                    assert(target.required_signal == None)
+                    assert target.required_signal == None
                     signal_data = target.required_signal
                 except KeyError as e:
                     # KeyError may be raised when the signal is not available in the HDF5 file. Then we have a problem.
@@ -177,13 +178,12 @@ class shot_dataset_disk(Dataset):
             dset = h5_grp.create_dataset("tb", tb_rs.shape, dtype="f")
             dset[:] = tb_rs[:]
 
-
             #####
             ##### Old code: hard-code TTD target
             # 4th step: Transform time to time-to-disruption
-            #T_max = conf['data']['T_max']
-            #dt = conf['data']['dt']
-            #TODO (RK): Verify how this translates to using milliseconds as units
+            # T_max = conf['data']['T_max']
+            # dt = conf['data']['dt']
+            # TODO (RK): Verify how this translates to using milliseconds as units
             # if self.is_disruptive:
             #     target = max(tb_rs) - tb_rs
             #     # Maximum time to disruption
@@ -195,9 +195,7 @@ class shot_dataset_disk(Dataset):
             #####
             ##### TODO: New code - Implement abstraction of prediction targets
             ##### see primitives/targets.py
-            #target = self.target(tb, None)
-
-
+            # target = self.target(tb, None)
 
     def delete_data_file(self):
         """Deletes the temporary datafile.
@@ -306,9 +304,9 @@ class shot_dataset_disk(Dataset):
         current_ch = 0
         with h5py.File(self.tmp_fname, "r") as fp:
             for pred in self.predictors:
-                data = fp[f"/{self.group_name}/{pred.info['LocalPath']}"]["signal_data"][
-                    idx_sorted, :
-                ]
+                data = fp[f"/{self.group_name}/{pred.info['LocalPath']}"][
+                    "signal_data"
+                ][idx_sorted, :]
 
                 # Access pattern for 0d signals
                 if isinstance(idx, list):
@@ -325,7 +323,9 @@ class shot_dataset_disk(Dataset):
                 current_ch += pred.num_channels
             # Fetch prediction target
             # Reshape ttd to size (seq_length, 1)
-            target = torch.tensor(fp[f"/{self.group_name}/target"][idx_sorted]).reshape(-1, 1)
+            target = torch.tensor(fp[f"/{self.group_name}/target"][idx_sorted]).reshape(
+                -1, 1
+            )
 
         return output, target
 

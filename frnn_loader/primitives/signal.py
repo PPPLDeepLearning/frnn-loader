@@ -97,11 +97,11 @@ class signal_base:
         return fetcher.fetch(self.info, shotnr)
 
     def __eq__(self, other):
-        assert(isinstance(other, signal_base))
+        assert isinstance(other, signal_base)
         return self.__str__().__eq__(other.__str__())
 
     def __ne__(self, other):
-        assert(isinstance(other, signal_base))
+        assert isinstance(other, signal_base)
         return self.__str__().__ne__(other.__str__())
 
     def __str__(self):
@@ -122,7 +122,7 @@ class signal_0d(signal_base):
 
     def __init__(self, tag, sig_def_fname="d3d_signals.yaml"):
         super().__init__(tag, sig_def_fname)
-        assert(self.info["ndim"] == 0)
+        assert self.info["ndim"] == 0
         self.num_channels = 1
         # I'm skipping several parameters from the original definition here.
 
@@ -138,8 +138,6 @@ class signal_1d(signal_base):
 
     def __init__(self, tag, sig_def_fname="d3d_signals.yaml"):
         super().__init__(tag, sig_def_fname)
-        assert(self.info["ndim"] == 1)
+        assert self.info["ndim"] == 1
         self.num_channels = self.info["Channels"]
         # I'm skipping several parameters from the original definition here.
-
-

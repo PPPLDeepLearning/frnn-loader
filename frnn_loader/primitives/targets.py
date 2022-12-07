@@ -27,6 +27,7 @@ class target:
 
 class target_NULL(target):
     """NullTarget - A dummy class that outputs all zeros."""
+
     requires_signal = None
 
     def __call__(self, tb, signal=None):
@@ -40,11 +41,11 @@ class target_TTD(target):
     """
 
     required_signal = None
+
     def __init__(self, dt, is_disruptive, ttd_max=200.0):
         self.dt = dt
         self.is_disruptive = is_disruptive
         self.ttd_max = ttd_max
-
 
     def pick_predictor(self, predictors):
         """Picks a predictor to calculate target from.
@@ -53,7 +54,6 @@ class target_TTD(target):
         and returns None
         """
         return None
-
 
     def __call__(self, tb, signal=None):
         if self.is_disruptive:
@@ -115,7 +115,9 @@ class target_TTELM(target):
         """
         self.max_ttelm = max_ttelm
         self.dt = dt
-        logging.info(f"{self.max_ttelm}, {self.dt}, {type(self.max_ttelm)}, {type(self.dt)}")
+        logging.info(
+            f"{self.max_ttelm}, {self.dt}, {type(self.max_ttelm)}, {type(self.dt)}"
+        )
         self.max_ttelm_ix = int(self.max_ttelm / self.dt)
         self.threshold = threshold
         self.deadtime = deadtime
@@ -124,7 +126,7 @@ class target_TTELM(target):
 
     def pick_predictor(self, predictors):
         """Picks predictor to calculate TTELM target.
-        
+
         Time-to-ELM is calculated from FS07.
         """
         return predictors.index(self.required_signal)
