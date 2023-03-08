@@ -1,6 +1,11 @@
 ![pipeline-status](https://gitlab.com/gitlab-org/gitlab/badges/main/pipeline.svg)
 ![coverage](https://gitlab.com/gitlab-org/gitlab/badges/main/coverage.svg?job=coverage)
 
+# Outdated
+As of 2023-03, this code is no longer maintained. Please use [d3d_loaders](https://github.com/PlasmaControl/d3d_loaders).
+Examples on how to use `d3d_loaders` are in
+
+
 # frnn-loader
 
 Code in this repository makes big fusion data available as [pytorch](https://pytorch.org/) style
